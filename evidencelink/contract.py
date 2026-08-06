@@ -22,6 +22,7 @@ MAIN_PROTOCOL_NAME = "evidencelink_pool_to_coverage_aware_selection"
 MAIN_ENTRYPOINT = "evidencelink/run_evidence_selection.py"
 MAIN_UPSTREAM_RETRIEVER_NAME = "source_grounded_evidence_link_pool"
 MAIN_POOL_PROVENANCE_KEY = "retrieval.input_method"
+EXTERNAL_UPSTREAM_RETRIEVER_NAME = "external_retriever"
 
 DEFAULT_READER_BUDGET_K = 5
 DEFAULT_STABILITY_WINDOW_M = DEFAULT_READER_BUDGET_K - 1
@@ -90,9 +91,53 @@ def pool_upstream_retriever(pool_payload: Mapping[str, object]) -> str:
     return str(retrieval.get("input_method") or "")
 
 
+def resolved_pool_upstream_retriever(pool_payload: Mapping[str, object]) -> str:
+    """Return explicit pool provenance or infer a uniform row protocol.
+
+    JSONL candidate pools cannot carry the wrapper-level
+    ``retrieval.input_method`` used by paper artifacts. New rows are therefore
+    self-describing through ``pool_trace.input_method``. Only a known, uniform
+    row-level protocol is inferred here; all other missing provenance remains
+    unknown.
+    """
+    upstream_retriever = pool_upstream_retriever(pool_payload).strip()
+    if upstream_retriever:
+        return upstream_retriever
+
+    records = pool_payload.get("records")
+    if not isinstance(records, list) or not records:
+        return ""
+    row_input_methods: set[str] = set()
+    for record in records:
+        if not isinstance(record, Mapping):
+            return ""
+        pool_trace = record.get("pool_trace")
+        if not isinstance(pool_trace, Mapping):
+            return ""
+        row_input_method = str(pool_trace.get("input_method") or "").strip()
+        if row_input_method not in {
+            EXTERNAL_UPSTREAM_RETRIEVER_NAME,
+            MAIN_UPSTREAM_RETRIEVER_NAME,
+        }:
+            return ""
+        row_input_methods.add(row_input_method)
+    if len(row_input_methods) != 1:
+        return ""
+    return row_input_methods.pop()
+
+
+def pool_provenance_key(pool_payload: Mapping[str, object]) -> str:
+    """Return the artifact path that supplied the resolved pool protocol."""
+    if pool_upstream_retriever(pool_payload).strip():
+        return MAIN_POOL_PROVENANCE_KEY
+    if resolved_pool_upstream_retriever(pool_payload):
+        return "records[].pool_trace.input_method"
+    return ""
+
+
 def is_main_evidencelink_pool(pool_payload: Mapping[str, object]) -> bool:
     """Return whether a pool is the main EvLink input expected by EvLink."""
-    return pool_upstream_retriever(pool_payload) == MAIN_UPSTREAM_RETRIEVER_NAME
+    return resolved_pool_upstream_retriever(pool_payload) == MAIN_UPSTREAM_RETRIEVER_NAME
 
 
 def admission_window(reader_budget_k: int, stability_window_m: int) -> int:

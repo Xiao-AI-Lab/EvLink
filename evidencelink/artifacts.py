@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+from evidencelink.contract import MAIN_UPSTREAM_RETRIEVER_NAME
+
 
 @dataclass(frozen=True)
 class Document:
@@ -157,6 +159,7 @@ class CandidatePoolRecord:
             "pool_doc_ids": [item.doc_id for item in self.candidate_pool],
             "pool_doc_scores": [item.score for item in self.candidate_pool],
             "pool_trace": {
+                "input_method": MAIN_UPSTREAM_RETRIEVER_NAME,
                 "anchors": list(self.anchors),
                 "seed_doc_ids": list(self.seed_doc_ids),
                 "local_subgraph": dict(self.local_subgraph),

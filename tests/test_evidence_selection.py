@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from evidencelink.evidence_selection import compose_evidence_selection
+from evidencelink.io_utils import evidence_selection_trace
 from evidencelink.pool_alignment import (
     align_pool_record,
     build_doc_text_to_chunk_id,
@@ -66,10 +67,34 @@ def test_compose_evidence_selection_uses_rank_stability_and_candidate_admission(
 
     assert result.final_positions == (0, 1, 7)
     assert result.stable_seed_positions == (0, 1)
+    assert result.protected_baseline_positions == (0, 1)
+    assert result.protected_baseline_titles == ("A", "B")
     assert result.admitted_positions == (7,)
+    assert result.trace["stable_seed_positions"] == [0, 1]
+    assert result.trace["stable_seed_titles"] == ["A", "B"]
+    assert result.trace["protected_baseline_positions"] == [0, 1]
+    assert result.trace["protected_baseline_titles"] == ["A", "B"]
     assert result.trace["decision"] == "admit"
     assert result.trace["rank_stability_held"] is True
     assert result.trace["best_candidate_title"] == "Gold Bridge"
+
+
+def test_legacy_trace_projection_adds_protected_baseline_aliases() -> None:
+    trace = evidence_selection_trace(
+        {
+            "baseline_top_titles": ["A", "B", "C"],
+            "selected_top_titles": ["A", "B", "Gold Bridge"],
+            "selection_trace": {},
+        },
+        reader_budget_k=3,
+        stability_window_m=2,
+        pool_k=10,
+    )
+
+    assert trace["stable_seed_positions"] == [0, 1]
+    assert trace["stable_seed_titles"] == ["A", "B"]
+    assert trace["protected_baseline_positions"] == [0, 1]
+    assert trace["protected_baseline_titles"] == ["A", "B"]
 
 
 def test_frozen_report_requirement_provider_loads_by_question(tmp_path: Path) -> None:

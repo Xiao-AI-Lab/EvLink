@@ -142,6 +142,12 @@ def evidence_selection_trace(
     safe_trace = safe_projection_trace(selection_trace)
     baseline_titles = baseline_titles_from_trace(trace)[:reader_budget_k]
     final_titles = final_titles_from_trace(trace)[:reader_budget_k]
+    protected_baseline_positions = list(
+        range(min(int(stability_window_m), len(baseline_titles)))
+    )
+    protected_baseline_titles = [
+        baseline_titles[pos] for pos in protected_baseline_positions
+    ]
     steps = swap_steps(selection_trace)
     first_step = steps[0] if steps else {}
     decision = "admit" if steps and baseline_titles != final_titles else "keep_baseline"
@@ -158,7 +164,10 @@ def evidence_selection_trace(
         "retention_proxy": DEFAULT_RETENTION_PROXY,
         "admission_objective": DEFAULT_ADMISSION_OBJECTIVE,
         "baseline_top5_titles": baseline_titles,
-        "stable_seed_titles": baseline_titles[:stability_window_m],
+        "stable_seed_positions": list(protected_baseline_positions),
+        "stable_seed_titles": list(protected_baseline_titles),
+        "protected_baseline_positions": list(protected_baseline_positions),
+        "protected_baseline_titles": list(protected_baseline_titles),
         "admission_boundary_title": admission_boundary_title,
         "baseline_objective": safe_float(
             selection_trace.get("baseline_objective", safe_trace.get("baseline_objective")),

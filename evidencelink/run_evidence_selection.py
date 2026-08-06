@@ -34,7 +34,8 @@ from evidencelink.contract import (  # noqa: E402
     MAIN_UPSTREAM_RETRIEVER_NAME,
     PAPER_FACING_METHOD_NAME,
     is_main_evidencelink_pool,
-    pool_upstream_retriever,
+    pool_provenance_key,
+    resolved_pool_upstream_retriever,
 )
 from evidencelink.coverage_utility import (  # noqa: E402
     CoverageUtilityProvider,
@@ -252,7 +253,7 @@ def run_evidence_selection(args: argparse.Namespace) -> dict[str, Any]:
     retrieval_report = str(pool_payload.get("retrieval_report") or "")
     openie_path = str(pool_payload.get("openie_path") or source_payload.get("openie_path") or "")
     input_report = str(source_payload.get("input_report") or "")
-    upstream_retriever = pool_upstream_retriever(pool_payload)
+    upstream_retriever = resolved_pool_upstream_retriever(pool_payload)
     is_main_protocol = is_main_evidencelink_pool(pool_payload)
     return {
         "method": METHOD_NAME,
@@ -263,7 +264,7 @@ def run_evidence_selection(args: argparse.Namespace) -> dict[str, Any]:
             "is_main_table_evidencelink": bool(is_main_protocol),
             "upstream_retriever": upstream_retriever,
             "expected_main_upstream_retriever": MAIN_UPSTREAM_RETRIEVER_NAME,
-            "pool_provenance_key": "retrieval.input_method",
+            "pool_provenance_key": pool_provenance_key(pool_payload),
         },
         "dataset": str(args.dataset),
         "limit": int(len(records)),

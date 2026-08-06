@@ -100,6 +100,16 @@ class EvidenceSelectionResult:
     trace: Mapping[str, Any]
     raw_selection_trace: Mapping[str, Any] = field(default_factory=dict)
 
+    @property
+    def protected_baseline_positions(self) -> tuple[int, ...]:
+        """Baseline positions protected by the rank-stability guard."""
+        return self.stable_seed_positions
+
+    @property
+    def protected_baseline_titles(self) -> tuple[str, ...]:
+        """Baseline titles protected by the rank-stability guard."""
+        return tuple(str(item) for item in self.trace.get("protected_baseline_titles", ()))
+
 
 def ordered_unique_positions(values: Sequence[Any], *, pool_size: int, limit: int) -> list[int]:
     positions: list[int] = []

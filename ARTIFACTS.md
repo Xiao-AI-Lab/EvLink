@@ -146,8 +146,21 @@ Main fields:
 - `evidence_selection_query_traces`;
 - `evidence_selection_config`.
 
+The root-level `pool_protocol` records the upstream candidate-pool protocol.
+Wrapped paper artifacts declare it through `retrieval.input_method`. JSONL
+candidate pools created by the self-index pipeline or the public external
+adapter declare it through each row's `pool_trace.input_method`.
+`pool_protocol.pool_provenance_key` records which of these paths supplied the
+resolved value.
+
 Each row contains the selected final evidence set `R_q`, top titles/documents,
 retrieval metrics when gold titles are available, and evidence-selection trace metadata.
+
+Within `evidence_selection`, `protected_baseline_positions` and
+`protected_baseline_titles` identify the leading baseline reader positions
+protected by the rank-stability guard. They are not dense or anchor retrieval
+seeds. The legacy aliases `stable_seed_positions` and `stable_seed_titles` are
+retained throughout v0.x for artifact compatibility.
 
 ## Reader Artifact
 

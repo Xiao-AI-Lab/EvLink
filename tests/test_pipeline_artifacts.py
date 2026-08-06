@@ -12,6 +12,7 @@ from evidencelink.openie import build_openie_facts
 from evidencelink.run_evidence_selection import run_evidence_selection
 from evidencelink.io_utils import write_json
 from evidencelink.artifacts import read_jsonl
+from evidencelink.contract import MAIN_UPSTREAM_RETRIEVER_NAME
 
 
 def write_fixture(tmp_path: Path) -> tuple[Path, Path]:
@@ -133,6 +134,11 @@ def test_public_pipeline_smoke_runs_to_selection(tmp_path: Path) -> None:
 
     assert report["summary"]["count"] == 1
     assert report["rows"][0]["retrieved_titles_top5"]
+    assert report["pool_protocol"]["upstream_retriever"] == MAIN_UPSTREAM_RETRIEVER_NAME
+    assert report["pool_protocol"]["pool_provenance_key"] == (
+        "records[].pool_trace.input_method"
+    )
+    assert report["pool_protocol"]["role"] == "main_evidencelink"
 
 
 def test_jsonl_candidate_pool_matches_records_json_for_evidence_selection(tmp_path: Path) -> None:

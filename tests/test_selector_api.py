@@ -204,6 +204,12 @@ def test_sdk_artifacts_round_trip_through_stage_cli_defaults(tmp_path: Path) -> 
     assert payload["rows"][0]["query_id"] == "acme-round-trip"
     assert payload["rows"][0]["evidence_selection"]["final_positions"] == result.trace["final_positions"]
     assert payload["rows"][0]["evidence_selection"]["input_method"] == "external_retriever"
+    assert payload["pool_protocol"]["upstream_retriever"] == "external_retriever"
+    assert payload["pool_protocol"]["pool_provenance_key"] == (
+        "records[].pool_trace.input_method"
+    )
+    assert payload["pool_protocol"]["role"] == "compatibility_or_ablation"
+    assert payload["rows"][0]["evidence_selection"]["protected_baseline_positions"] == [0]
 
 
 def test_external_retriever_example_runs_from_source_checkout() -> None:
