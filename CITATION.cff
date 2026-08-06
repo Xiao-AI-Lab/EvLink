@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use EvidenceLink, please cite this software and the associated paper."
-title: "EvidenceLink: Source-Grounded Evidence Linking for Graph RAG"
+message: "If you use EvLink, please cite this software and the associated paper."
+title: "EvLink: Source-grounded Evidence Linking for Graph RAG"
 type: software
 authors:
   - name: "Xiao AI Lab contributors"

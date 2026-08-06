@@ -1,4 +1,4 @@
-"""OpenIE fact extraction entrypoint for EvidenceLink."""
+"""OpenIE fact extraction entrypoint for EvLink."""
 
 from __future__ import annotations
 
@@ -120,7 +120,7 @@ def build_openie_facts(args: argparse.Namespace) -> list[OpenIEFact]:
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Build OpenIE fact artifacts for EvidenceLink.")
+    parser = argparse.ArgumentParser(description="Build OpenIE fact artifacts for EvLink.")
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--mode", choices=("simple", "llm"), default="simple")

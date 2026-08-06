@@ -1,4 +1,4 @@
-# EvidenceLink Reproduction Protocol
+# EvLink Reproduction Protocol
 
 This directory defines the public, configuration-driven reproduction surface.
 It covers offline validation, benchmark preparation, model-backed runs,
@@ -76,7 +76,7 @@ The same source commit can produce different model-backed results when model
 revisions, endpoint implementations, or cached generations differ. An exact
 paper-result claim therefore requires all items in the run-record checklist:
 
-1. EvidenceLink Git commit and package version.
+1. EvLink Git commit and `evidencelink` package version.
 2. Prepared dataset manifest and source revision.
 3. LLM and embedding model identifiers and revisions.
 4. Endpoint implementation and generation parameters.

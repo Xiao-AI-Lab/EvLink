@@ -1,4 +1,4 @@
-"""EvidenceLink: source-grounded evidence links and coverage-aware selection."""
+"""EvLink: source-grounded evidence links and coverage-aware selection."""
 
 __version__ = "0.1.0"
 

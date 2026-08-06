@@ -1,4 +1,4 @@
-"""Pool document alignment used by EvidenceLink evidence selection."""
+"""Pool document alignment used by EvLink evidence selection."""
 
 from __future__ import annotations
 

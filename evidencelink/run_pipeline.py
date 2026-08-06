@@ -1,4 +1,4 @@
-"""Run the public EvidenceLink paper-facing pipeline end to end."""
+"""Run the public EvLink paper-facing pipeline end to end."""
 
 from __future__ import annotations
 

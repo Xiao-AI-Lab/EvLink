@@ -1,4 +1,4 @@
-"""Binding-cache generation for coverage-aware EvidenceLink selection."""
+"""Binding-cache generation for coverage-aware EvLink selection."""
 
 from __future__ import annotations
 
@@ -119,7 +119,7 @@ def build_binding_cache(args: argparse.Namespace) -> dict[str, list[str]]:
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Build an EvidenceLink binding cache for coverage-aware selection.")
+    parser = argparse.ArgumentParser(description="Build an EvLink binding cache for coverage-aware selection.")
     parser.add_argument("--candidate-pool", required=True, type=Path)
     parser.add_argument("--evidence-needs", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)

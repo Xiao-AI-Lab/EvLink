@@ -3,7 +3,7 @@
   "mirror": {
     "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
     "revision": "c617143f01477243992a63b2e2151cc003dd3b21",
-    "notes": "The automatic entries are checksum-identical mirrors of the compact paper benchmark files previously used by EvidenceLink. Dataset licenses remain governed by the original dataset owners."
+    "notes": "The automatic entries are checksum-identical mirrors of the compact paper benchmark files previously used by EvLink. Dataset licenses remain governed by the original dataset owners."
   },
   "datasets": {
     "2wikimultihopqa": {
@@ -33,13 +33,13 @@
     "nq_rear": {
       "upstream": "https://ai.google.com/research/NaturalQuestions",
       "license": "See upstream dataset terms",
-      "notes": "EvidenceLink expects the HippoRAG-style 1K query and corpus files. No stable checksum-pinned public mirror has been approved for automatic download.",
+      "notes": "EvLink expects the HippoRAG-style 1K query and corpus files. No stable checksum-pinned public mirror has been approved for automatic download.",
       "files": []
     },
     "popqa": {
       "upstream": "https://github.com/AlexTMallen/adaptive-retrieval",
       "license": "MIT repository; verify dataset terms before redistribution",
-      "notes": "EvidenceLink expects the HippoRAG-style 1K query and corpus files. No stable checksum-pinned public mirror has been approved for automatic download.",
+      "notes": "EvLink expects the HippoRAG-style 1K query and corpus files. No stable checksum-pinned public mirror has been approved for automatic download.",
       "files": []
     }
   }

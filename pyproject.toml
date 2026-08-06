@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "evidencelink"
 version = "0.1.0"
-description = "EvidenceLink source-grounded evidence retrieval and coverage-aware selection."
+description = "EvLink source-grounded evidence linking for Graph RAG and multi-hop question answering."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -16,6 +16,7 @@ authors = [
 keywords = [
   "retrieval-augmented generation",
   "graph rag",
+  "graphrag",
   "evidence retrieval",
   "multi-hop question answering",
 ]

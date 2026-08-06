@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run EvidenceLink coverage-aware evidence selection over an exported pool.
+"""Run EvLink coverage-aware evidence selection over an exported pool.
 
 The runner expects an exported candidate pool, a frozen evidence-need report,
 and a frozen binding cache.

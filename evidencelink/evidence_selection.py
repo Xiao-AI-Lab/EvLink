@@ -1,4 +1,4 @@
-"""Coverage-aware evidence selection over an exported EvidenceLink candidate pool."""
+"""Coverage-aware evidence selection over an exported EvLink candidate pool."""
 
 from __future__ import annotations
 

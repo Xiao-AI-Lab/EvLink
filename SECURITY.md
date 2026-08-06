@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Security fixes are applied to the latest released EvidenceLink version. The
+Security fixes are applied to the latest released EvLink version. The
 project is currently pre-1.0, so users should review release notes before
 upgrading across minor versions.
 
@@ -15,7 +15,7 @@ steps, impact, and any suggested mitigation.
 
 ## Secrets and External Services
 
-EvidenceLink accepts OpenAI-compatible endpoint URLs and API keys at runtime.
+EvLink accepts OpenAI-compatible endpoint URLs and API keys at runtime.
 Keep keys in environment variables or a secret manager. Never commit them to
 configuration files, artifacts, examples, logs, or caches. The default public
 examples and CI do not call external model services.

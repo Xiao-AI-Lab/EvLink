@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke-test an installed EvidenceLink wheel without source-tree imports."""
+"""Smoke-test an installed EvLink wheel without source-tree imports."""
 
 from __future__ import annotations
 

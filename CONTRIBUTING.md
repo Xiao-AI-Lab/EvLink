@@ -1,6 +1,6 @@
-# Contributing to EvidenceLink
+# Contributing to EvLink
 
-EvidenceLink accepts focused bug fixes, documentation improvements, retriever
+EvLink accepts focused bug fixes, documentation improvements, retriever
 adapters, and reproducibility improvements that preserve the public artifact
 contract. Discuss broad API or method changes in an issue before implementation.
 
@@ -27,7 +27,7 @@ python examples/integrations/lightrag.py
 - Keep Python 3.10 compatibility.
 - Add focused tests for changed behavior and failure modes.
 - Preserve candidate ordering, identifiers, scores, and provenance labels.
-- Do not present external-retriever candidates as EvidenceLink source-grounded
+- Do not present external-retriever candidates as EvLink source-grounded
   graph links.
 - Keep default tests and examples offline and deterministic.
 - Do not commit model weights, benchmark source files, embeddings, graph

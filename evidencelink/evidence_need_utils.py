@@ -957,7 +957,7 @@ def _build_evidence_link_graph_prior(
     w_rank: float = 0.2,
     dense_anchor_top_k: int = 20,
 ) -> Tuple[np.ndarray, Dict[str, object]]:
-    """Build a per-document EvidenceLink prior aligned to the current coverage-aware selection pool."""
+    """Build a per-document EvLink prior aligned to the current coverage-aware selection pool."""
     limit = max(0, min(int(pool_limit), len(pool_doc_ids)))
     prior = np.zeros(limit, dtype=float)
     trace: Dict[str, object] = {
@@ -1583,7 +1583,7 @@ def select_coverage_aware_positions(
     precomputes phi[requirement, binding, document], and then runs greedy
     maximization over a single noisy-OR set objective. Historical gates, repair
     filters, and selection-time binding mutation intentionally do not
-    participate in this path. The optional EvidenceLink graph prior is additive and
+    participate in this path. The optional EvLink graph prior is additive and
     disabled by default, so beta=0 keeps the pure noisy-OR selection.
     """
     selection_label = selection_label_override or ("coverage_noisy_or_safe" if bool(safe_projection) else "coverage_noisy_or")

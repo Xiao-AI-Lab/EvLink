@@ -1,4 +1,4 @@
-"""Coverage utility provider for EvidenceLink evidence selection."""
+"""Coverage utility provider for EvLink evidence selection."""
 
 from __future__ import annotations
 

@@ -1,14 +1,14 @@
-# EvidenceLink
+# EvLink: Source-grounded Evidence Linking for Graph RAG
 
 [![Tests](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml/badge.svg)](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml)
 [![Package](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml/badge.svg)](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-EvidenceLink is a source-grounded evidence-link retrieval and coverage-aware
-selection layer for RAG systems. It can run as an end-to-end research pipeline
-or select a fixed-budget evidence set from candidates produced by an existing
-retriever.
+EvLink is a graph-based retriever built on source-grounded evidence links for
+Graph RAG. It can run as an end-to-end research pipeline or select a compact,
+fixed-budget evidence set from candidates produced by an existing retriever.
+The Python distribution and import package are named `evidencelink`.
 
 The public package focuses on three properties:
 
@@ -95,11 +95,11 @@ python examples/external_retriever.py
 
 Passing `workdir="runs/selection"` retains the candidate-pool, evidence-need,
 binding-cache, and selection artifacts for inspection. External candidates are
-treated as compatibility inputs; only candidates produced by the EvidenceLink
+treated as compatibility inputs; only candidates produced by the EvLink
 index carry the method's source-grounded link provenance.
 
 Dependency-free adapters are included for current HippoRAG and LightRAG result
-shapes. Neither third-party package is installed or imported by EvidenceLink:
+shapes. Neither third-party package is installed or imported by EvLink:
 
 ```python
 from evidencelink import candidates_from_hipporag, candidates_from_lightrag
@@ -110,11 +110,11 @@ lightrag_candidates = candidates_from_lightrag(query_result)
 
 Offline examples are available at `examples/integrations/hipporag.py` and
 `examples/integrations/lightrag.py`. Upstream metadata is preserved, but the
-adapters do not synthesize EvidenceLink edge witnesses.
+adapters do not synthesize EvLink edge witnesses.
 
 ## Paper-Facing API
 
-Use `evidencelink.api` when wiring EvidenceLink into another benchmark or
+Use `evidencelink.api` when wiring EvLink into another benchmark or
 paper reproduction workflow. The API names follow the paper artifacts:
 candidate pools `C_q`, evidence needs `B(q)`, support cache, and final evidence
 sets `R_q`.
@@ -146,7 +146,7 @@ evidencelink-pipeline \
 
 ## Benchmark Dataset Registry
 
-EvidenceLink includes a lightweight registry and converter for the five paper
+EvLink includes a lightweight registry and converter for the five paper
 benchmarks:
 
 | Dataset | Canonical name | Source format |

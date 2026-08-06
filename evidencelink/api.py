@@ -1,4 +1,4 @@
-"""Paper-facing API for the public EvidenceLink package.
+"""Paper-facing API for the public EvLink package.
 
 This module keeps the public method boundary aligned with the paper notation:
 
@@ -37,7 +37,7 @@ from evidencelink.run_evidence_selection import run_evidence_selection
 
 @dataclass(frozen=True)
 class PaperPipelineArtifacts:
-    """Standard EvidenceLink artifact paths for one paper-facing run."""
+    """Standard EvLink artifact paths for one paper-facing run."""
 
     workdir: Path
     openie_facts: Path
@@ -66,7 +66,7 @@ class PaperPipelineArtifacts:
 
 @dataclass(frozen=True)
 class PaperPipelineConfig:
-    """Configuration for the paper-facing EvidenceLink runner."""
+    """Configuration for the paper-facing EvLink runner."""
 
     dataset: str = "custom"
     reader_budget_k: int = DEFAULT_READER_BUDGET_K
@@ -319,7 +319,7 @@ def run_paper_pipeline(
     workdir: str | Path,
     config: PaperPipelineConfig | None = None,
 ) -> dict[str, Any]:
-    """Run the paper-facing EvidenceLink pipeline end to end."""
+    """Run the paper-facing EvLink pipeline end to end."""
 
     cfg = config or PaperPipelineConfig()
     artifacts = PaperPipelineArtifacts.from_workdir(workdir)

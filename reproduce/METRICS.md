@@ -1,6 +1,6 @@
 # Aggregate Metric Definitions
 
-EvidenceLink reports retrieval and optional reader metrics separately.
+EvLink reports retrieval and optional reader metrics separately.
 
 ## Retrieval Metrics
 

@@ -1,6 +1,6 @@
 # Benchmark Data Preparation
 
-Benchmark source files are not committed to EvidenceLink. `datasets/raw/` is a
+Benchmark source files are not committed to EvLink. `datasets/raw/` is a
 local download/placement directory ignored by Git. The repository only carries
 a deterministic toy fixture under `datasets/fixtures/` and a checksum-pinned
 source manifest in `evidencelink/data/dataset_sources.json`.
@@ -54,7 +54,7 @@ counts.
 
 ## License Responsibility
 
-The EvidenceLink MIT license covers EvidenceLink source code, not third-party
+The EvLink MIT license covers EvLink source code, not third-party
 datasets. Users are responsible for reviewing and complying with each upstream
 dataset's terms. The manifest links to the upstream projects and records known
 license information without granting redistribution rights.

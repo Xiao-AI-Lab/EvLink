@@ -1,4 +1,4 @@
-"""Evidence-need mining for EvidenceLink."""
+"""Evidence-need mining for EvLink."""
 
 from __future__ import annotations
 
@@ -105,7 +105,7 @@ def build_evidence_need_rows(args: argparse.Namespace) -> list[dict[str, object]
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Build EvidenceLink evidence needs B(q).")
+    parser = argparse.ArgumentParser(description="Build EvLink evidence needs B(q).")
     parser.add_argument("--questions", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--mode", choices=("llm", "whole_question", "anchor_list"), default="llm")

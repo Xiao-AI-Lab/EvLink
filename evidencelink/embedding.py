@@ -1,4 +1,4 @@
-"""OpenAI-compatible embedding client used by standalone EvidenceLink."""
+"""OpenAI-compatible embedding client used by standalone EvLink."""
 
 from __future__ import annotations
 

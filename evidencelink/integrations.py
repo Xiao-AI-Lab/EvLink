@@ -1,10 +1,10 @@
 """Dependency-free adapters for external retriever result objects.
 
-The adapters in this module use duck typing so EvidenceLink does not require
+The adapters in this module use duck typing so EvLink does not require
 HippoRAG or LightRAG at installation time. They only normalize upstream
 retrieval results into the candidate mapping accepted by :class:`EvidenceSelector`.
 Upstream graph seeds, references, and file paths remain upstream metadata; they
-are not relabeled as EvidenceLink source-grounded edge witnesses.
+are not relabeled as EvLink source-grounded edge witnesses.
 """
 
 from __future__ import annotations

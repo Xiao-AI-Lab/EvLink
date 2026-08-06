@@ -1,9 +1,9 @@
 """Public integration API for selecting evidence from external retrievers.
 
-This module adapts an ordered candidate list to the EvidenceLink artifact
+This module adapts an ordered candidate list to the EvLink artifact
 contract, then runs evidence-need mining, support binding, and fixed-budget
 coverage-aware selection. It does not claim that arbitrary external candidates
-have source-grounded EvidenceLink edges; that provenance remains the upstream
+have source-grounded EvLink edges; that provenance remains the upstream
 retriever's responsibility.
 """
 
@@ -238,7 +238,7 @@ class EvidenceSelector:
     ) -> EvidenceSelection:
         """Run coverage-aware selection over one ordered candidate list.
 
-        When ``workdir`` is provided, the intermediate EvidenceLink artifacts
+        When ``workdir`` is provided, the intermediate EvLink artifacts
         are retained for inspection. Otherwise they are created in a temporary
         directory and only the structured result is returned.
         """
@@ -379,7 +379,7 @@ class EvidenceSelector:
         )
         rows = list(payload.get("rows") or [])
         if not rows:
-            raise RuntimeError("EvidenceLink selection returned no rows")
+            raise RuntimeError("EvLink selection returned no rows")
         row = dict(rows[0])
         trace = dict(row.get("evidence_selection") or {})
         selected_positions = [int(pos) for pos in list(trace.get("final_positions") or [])]

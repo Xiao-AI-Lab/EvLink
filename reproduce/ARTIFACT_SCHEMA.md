@@ -20,7 +20,7 @@ One end-to-end run writes these artifacts in dependency order:
 - External candidate pools record `pool_trace.input_method` as
   `external_retriever`; their `source` and `metadata` remain upstream
   provenance.
-- EvidenceLink-built graph candidates may contain `path` and `edge_evidence`;
+- EvLink-built graph candidates may contain `path` and `edge_evidence`;
   adapters do not synthesize these fields from third-party graph metadata.
 
 ## Selection Output

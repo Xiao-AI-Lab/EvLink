@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a lightweight OpenAI-compatible reader over EvidenceLink top-5 reports."""
+"""Run a lightweight OpenAI-compatible reader over EvLink top-5 reports."""
 
 from __future__ import annotations
 

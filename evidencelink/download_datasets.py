@@ -1,4 +1,4 @@
-"""Download checksum-pinned benchmark source files for EvidenceLink."""
+"""Download checksum-pinned benchmark source files for EvLink."""
 
 from __future__ import annotations
 
@@ -64,7 +64,7 @@ def download_file(
         )
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    request = urllib.request.Request(url, headers={"User-Agent": "EvidenceLink-dataset-downloader/0.1"})
+    request = urllib.request.Request(url, headers={"User-Agent": "EvLink-dataset-downloader/0.1"})
     with NamedTemporaryFile(prefix=f".{filename}.", dir=output.parent, delete=False) as handle:
         temporary = Path(handle.name)
         try:

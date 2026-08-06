@@ -1,4 +1,4 @@
-"""Artifact schemas and JSON helpers for the public EvidenceLink pipeline."""
+"""Artifact schemas and JSON helpers for the public EvLink pipeline."""
 
 from __future__ import annotations
 

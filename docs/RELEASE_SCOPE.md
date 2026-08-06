@@ -1,6 +1,6 @@
-# EvidenceLink v0.1 Release Scope
+# EvLink v0.1 Release Scope
 
-EvidenceLink v0.1 provides a compact research SDK and reproducibility surface.
+EvLink v0.1 provides a compact research SDK and reproducibility surface.
 
 ## Included
 

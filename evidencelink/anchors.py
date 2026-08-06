@@ -1,4 +1,4 @@
-"""Question anchor extraction for query-local EvidenceLink induction."""
+"""Question anchor extraction for query-local EvLink induction."""
 
 from __future__ import annotations
 

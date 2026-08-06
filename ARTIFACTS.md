@@ -1,6 +1,6 @@
-# EvidenceLink Artifacts
+# EvLink Artifacts
 
-EvidenceLink stages communicate through explicit JSON or JSONL artifacts. This
+EvLink stages communicate through explicit JSON or JSONL artifacts. This
 keeps evidence-link construction, query-local induction, and coverage-aware
 selection inspectable as separate steps.
 
@@ -104,7 +104,7 @@ Each candidate includes:
 - `metadata`.
 
 For external retrievers, `metadata` retains upstream reference/file/collection
-information. Adapters do not convert upstream graph seeds into EvidenceLink
+information. Adapters do not convert upstream graph seeds into EvLink
 `edge_evidence`.
 
 ### `evidence_needs.jsonl`

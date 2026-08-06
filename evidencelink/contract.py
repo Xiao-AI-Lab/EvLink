@@ -1,6 +1,6 @@
-"""Public method contract for EvidenceLink.
+"""Public method contract for EvLink.
 
-The reported EvidenceLink protocol is:
+The reported EvLink protocol is:
 
     source-grounded evidence-link pool -> coverage-aware evidence selection
     -> top-5 reader input
@@ -13,8 +13,8 @@ from typing import Mapping
 
 METHOD_FAMILY = "source_grounded_evidence_link_retrieval"
 METHOD_VERSION = "v4_composition"
-METHOD_NAME = "evidencelink"
-PAPER_FACING_METHOD_NAME = "EvidenceLink"
+METHOD_NAME = "evlink"
+PAPER_FACING_METHOD_NAME = "EvLink"
 SELECTION_COMPONENT_NAME = "Coverage-Aware Evidence Selection"
 SELECTION_NAME = "coverage_aware_evidence_selection"
 COVERAGE_SELECTION_NAME = "noisy_or_marginal_coverage"
@@ -44,10 +44,10 @@ METHOD_CONTRACT: Mapping[str, object] = {
     "main_upstream_retriever": MAIN_UPSTREAM_RETRIEVER_NAME,
     "main_pool_provenance_key": MAIN_POOL_PROVENANCE_KEY,
     "main_pool_contract": (
-        "Table-1 EvidenceLink requires an external pool whose "
+        "Table-1 EvLink requires an external pool whose "
         "retrieval.input_method is source_grounded_evidence_link_pool."
     ),
-    "uses_EvidenceLink_fact_witnessed_sto_pool_for_main_table": True,
+    "uses_evlink_fact_witnessed_sto_pool_for_main_table": True,
     "uses_historical_experiment_adapter": False,
     "selection_component": SELECTION_COMPONENT_NAME,
     "selection_object": SELECTION_NAME,
@@ -91,7 +91,7 @@ def pool_upstream_retriever(pool_payload: Mapping[str, object]) -> str:
 
 
 def is_main_evidencelink_pool(pool_payload: Mapping[str, object]) -> bool:
-    """Return whether a pool is the main EvidenceLink input expected by EvidenceLink."""
+    """Return whether a pool is the main EvLink input expected by EvLink."""
     return pool_upstream_retriever(pool_payload) == MAIN_UPSTREAM_RETRIEVER_NAME
 
 

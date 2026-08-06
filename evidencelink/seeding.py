@@ -1,4 +1,4 @@
-"""Dense and anchor seeding for EvidenceLink candidate-pool construction."""
+"""Dense and anchor seeding for EvLink candidate-pool construction."""
 
 from __future__ import annotations
 

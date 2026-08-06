@@ -151,7 +151,7 @@ def build_evidence_link_index(
 def build_arg_parser():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Build a source-grounded EvidenceLink index from corpus and OpenIE facts.")
+    parser = argparse.ArgumentParser(description="Build a source-grounded EvLink index from corpus and OpenIE facts.")
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--openie", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)

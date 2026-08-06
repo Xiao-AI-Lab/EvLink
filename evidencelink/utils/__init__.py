@@ -1,1 +1,1 @@
-"""Utility helpers for the standalone EvidenceLink package."""
+"""Utility helpers for the standalone EvLink package."""

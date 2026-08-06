@@ -1,4 +1,4 @@
-"""I/O and metric helpers for the coverage-aware evidence selection component used by EvidenceLink."""
+"""I/O and metric helpers for the coverage-aware evidence selection component used by EvLink."""
 
 from __future__ import annotations
 

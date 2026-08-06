@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Deterministic one-query EvidenceLink artifact smoke run.",
+  "description": "Deterministic one-query EvLink artifact smoke run.",
   "inputs": {
     "corpus": "examples/corpus.jsonl",
     "questions": "examples/questions.jsonl"

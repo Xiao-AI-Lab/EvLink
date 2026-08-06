@@ -57,7 +57,7 @@ def test_paper_facing_pipeline_api_runs_to_rq(tmp_path: Path) -> None:
     )
 
     artifacts = payload["artifacts"]
-    assert payload["method"] == "EvidenceLink"
+    assert payload["method"] == "EvLink"
     assert payload["selection_summary"]["count"] == 1
     assert Path(artifacts["candidate_pool"]).exists()
     assert Path(artifacts["evidence_needs"]).exists()

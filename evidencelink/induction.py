@@ -115,7 +115,7 @@ def write_candidate_pool(records: list[CandidatePoolRecord], output: str | Path)
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Build query-local EvidenceLink candidate pools C_q.")
+    parser = argparse.ArgumentParser(description="Build query-local EvLink candidate pools C_q.")
     parser.add_argument("--questions", required=True, type=Path)
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--index", required=True, type=Path)

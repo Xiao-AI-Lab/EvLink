@@ -1,4 +1,4 @@
-"""Convert supported benchmark datasets into EvidenceLink JSONL inputs."""
+"""Convert supported benchmark datasets into EvLink JSONL inputs."""
 
 from __future__ import annotations
 
@@ -103,7 +103,7 @@ def convert_corpus_rows(
     *,
     dataset: str | DatasetSpec,
 ) -> list[dict[str, Any]]:
-    """Convert source corpus rows into the EvidenceLink corpus schema."""
+    """Convert source corpus rows into the EvLink corpus schema."""
 
     spec = dataset if isinstance(dataset, DatasetSpec) else dataset_spec(dataset)
     converted: list[dict[str, Any]] = []
@@ -311,7 +311,7 @@ def convert_question_rows(
     corpus_records: Sequence[Mapping[str, Any]],
     max_queries: int = 0,
 ) -> list[dict[str, Any]]:
-    """Convert source question rows into the EvidenceLink question schema."""
+    """Convert source question rows into the EvLink question schema."""
 
     spec = dataset if isinstance(dataset, DatasetSpec) else dataset_spec(dataset)
     selected_rows = list(dataset_rows[: int(max_queries)] if int(max_queries) > 0 else dataset_rows)
@@ -401,8 +401,8 @@ def prepare_benchmark_dataset(
         "question_count": len(question_records),
         "max_queries": int(max_queries),
         "format": {
-            "corpus": "EvidenceLink corpus.jsonl",
-            "questions": "EvidenceLink questions.jsonl",
+            "corpus": "EvLink corpus.jsonl",
+            "questions": "EvLink questions.jsonl",
         },
     }
     write_json(manifest, output_manifest)
@@ -428,7 +428,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=str(DEFAULT_SOURCE_ROOT),
         help="Directory containing <dataset>.json and <dataset>_corpus.json. Defaults to datasets/raw.",
     )
-    parser.add_argument("--output-root", help="Output directory for prepared EvidenceLink inputs.")
+    parser.add_argument("--output-root", help="Output directory for prepared EvLink inputs.")
     parser.add_argument("--max-queries", type=int, default=0, help="Optional question limit; 0 keeps all rows.")
     parser.add_argument("--force", action="store_true", help="Overwrite existing prepared files.")
     parser.add_argument("--list-datasets", action="store_true", help="Print supported datasets and exit.")

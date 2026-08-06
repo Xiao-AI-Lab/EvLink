@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the public EvidenceLink pipeline from a versioned JSON config."""
+"""Run the public EvLink pipeline from a versioned JSON config."""
 
 from __future__ import annotations
 

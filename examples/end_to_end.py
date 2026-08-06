@@ -1,4 +1,4 @@
-"""Run the complete deterministic EvidenceLink pipeline from source inputs."""
+"""Run the complete deterministic EvLink pipeline from source inputs."""
 
 from __future__ import annotations
 
