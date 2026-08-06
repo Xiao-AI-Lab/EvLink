@@ -76,6 +76,8 @@ python examples/end_to_end.py
 See [reproduce/README.md](reproduce/README.md) for the reproduction protocol,
 [ARTIFACTS.md](ARTIFACTS.md) for artifact formats, and
 [docs/RELEASE_SCOPE.md](docs/RELEASE_SCOPE.md) for the v0.1 release boundary.
+The post-v0.1 application plan is documented in
+[docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## 🔌 Retriever Integration
 
