@@ -1,21 +1,36 @@
+<div align="center">
+
 # EvLink: Source-grounded Evidence Linking for Graph RAG
 
-[![Tests](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml/badge.svg)](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml)
-[![Package](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml/badge.svg)](https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<p>
+  <a href="https://github.com/Xiao-AI-Lab/EvLink"><img alt="GitHub repository" src="https://img.shields.io/badge/GitHub-EvLink-181717?style=flat-square&logo=github&logoColor=white"></a>
+  <a href="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml/badge.svg"></a>
+  <a href="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml"><img alt="Package" src="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml/badge.svg"></a>
+</p>
+<p>
+  <a href="https://www.python.org/downloads/"><img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white"></a>
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-2F855A?style=flat-square"></a>
+  <img alt="Graph RAG" src="https://img.shields.io/badge/Graph_RAG-source--grounded-0F766E?style=flat-square">
+  <a href="reproduce/README.md"><img alt="Reproduction protocol" src="https://img.shields.io/badge/reproduction-protocol-7C3AED?style=flat-square"></a>
+</p>
+
+[Quick Start](#-quick-start) · [Retriever Integration](#-retriever-integration) · [Reproduction](#-paper-reproduction) · [Artifacts](#-artifact-contract) · [Citation](#-citation-and-contact)
+
+</div>
 
 EvLink is a graph-based retriever built on source-grounded evidence links for
 Graph RAG. It can run as an end-to-end research pipeline or select a compact,
 fixed-budget evidence set from candidates produced by an existing retriever.
-The Python distribution and import package are named `evidencelink`.
 
-The public package focuses on three properties:
+> [!NOTE]
+> The Python distribution and import package are named `evidencelink`.
 
-- **source-grounded links** retain passage-level witnesses for graph traversal;
-- **coverage-aware selection** composes a fixed reader budget around the
+## ✨ Highlights
+
+- 🔗 **Source-grounded links** retain passage-level witnesses for graph traversal;
+- 🎯 **Coverage-aware selection** composes a fixed reader budget around the
   evidence needs of a question;
-- **retriever integration** accepts ordered candidates from dense, sparse, or
+- 🔌 **Retriever integration** accepts ordered candidates from dense, sparse, or
   graph retrievers without requiring users to replace their current stack.
 
 The package provides explicit artifact schemas, a deterministic end-to-end
@@ -24,6 +39,8 @@ smoke example, and inspectable selection traces.
 The included smoke example is intentionally small and deterministic; benchmark
 evaluation can be run by replacing the example inputs with the corresponding
 prepared artifacts.
+
+## 🧭 Pipeline
 
 The public pipeline follows the paper terminology end to end:
 
@@ -40,19 +57,22 @@ corpus + questions
   -> optional reader QA
 ```
 
-## Install
+## ⚡ Quick Start
 
 ```bash
+git clone https://github.com/Xiao-AI-Lab/EvLink.git
+cd EvLink
 python -m venv .venv
 . .venv/bin/activate
 pip install -e ".[dev]"
+python examples/end_to_end.py
 ```
 
 See [reproduce/README.md](reproduce/README.md) for the reproduction protocol,
 [ARTIFACTS.md](ARTIFACTS.md) for artifact formats, and
 [docs/RELEASE_SCOPE.md](docs/RELEASE_SCOPE.md) for the v0.1 release boundary.
 
-## Use With An Existing Retriever
+## 🔌 Retriever Integration
 
 Pass an ordered candidate list to `EvidenceSelector`. The default path is
 offline and deterministic; model-backed evidence needs and bindings can be
@@ -112,7 +132,7 @@ Offline examples are available at `examples/integrations/hipporag.py` and
 `examples/integrations/lightrag.py`. Upstream metadata is preserved, but the
 adapters do not synthesize EvLink edge witnesses.
 
-## Paper-Facing API
+## 🧪 Paper Reproduction
 
 Use `evidencelink.api` when wiring EvLink into another benchmark or
 paper reproduction workflow. The API names follow the paper artifacts:
@@ -144,7 +164,7 @@ evidencelink-pipeline \
   --force
 ```
 
-## Benchmark Dataset Registry
+## 🗂️ Benchmark Datasets
 
 EvLink includes a lightweight registry and converter for the five paper
 benchmarks:
@@ -181,7 +201,7 @@ evidencelink-prepare-dataset \
 See [datasets/README.md](datasets/README.md) for upstream terms and
 manual-source requirements.
 
-## End-to-End Demo
+## ▶️ End-to-End Demo
 
 The default demo path is offline: it uses a simple OpenIE extractor, simple
 whole-question evidence needs, a simple binding cache, and deterministic
@@ -216,7 +236,7 @@ python scripts/run_pipeline.py \
   --api-key "$EVLINK_API_KEY"
 ```
 
-## Stage CLIs
+## 🛠️ Stage CLIs
 
 ```bash
 python scripts/build_openie.py --corpus corpus.jsonl --output openie_facts.jsonl
@@ -253,7 +273,7 @@ python scripts/run_evidence_selection.py \
   --llm-binding-model simple-binding
 ```
 
-## Artifact Contract
+## 📐 Artifact Contract
 
 The main artifact formats are summarized in [ARTIFACTS.md](ARTIFACTS.md).
 
@@ -261,7 +281,7 @@ Facts are grounding material for evidence links; passages remain retrieval
 states. The candidate pool `C_q` is not the final evidence set. The final
 evidence set `R_q` is produced by coverage-aware evidence selection.
 
-## Maintained Examples
+## ✅ Maintained Examples
 
 The following examples are part of the tested v0.1 contract:
 
@@ -272,7 +292,7 @@ The following examples are part of the tested v0.1 contract:
 | `examples/integrations/hipporag.py` | HippoRAG result-shape adapter. |
 | `examples/integrations/lightrag.py` | LightRAG structured result adapter. |
 
-## Repository Layout
+## 🗃️ Repository Layout
 
 ```text
 evidencelink/   installable SDK
@@ -283,7 +303,7 @@ datasets/       toy fixtures and source preparation docs
 tests/          public contract and integration tests
 ```
 
-## Troubleshooting
+## 🩺 Troubleshooting
 
 - The default embedding backend is `deterministic-hash` with the `offline`
   endpoint. Set both `embedding_name` and `embedding_base_url` when switching
@@ -293,7 +313,7 @@ tests/          public contract and integration tests
 - Do not change embedding models inside an existing model-backed index. Rebuild
   the index so document and query vectors share the same embedding space.
 
-## Citation And Contact
+## 📚 Citation and Contact
 
 Citation metadata is provided in [CITATION.cff](CITATION.cff). The paper
 citation will be added when a stable public bibliographic record is available.
