@@ -5,6 +5,7 @@ include CITATION.cff
 include CONTRIBUTING.md
 include SECURITY.md
 include pyproject.toml
+recursive-include assets *.png
 recursive-include evidencelink *.py *.json
 recursive-include examples *.py *.jsonl
 recursive-include scripts *.py

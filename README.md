@@ -22,6 +22,11 @@ EvLink is a graph-based retriever built on source-grounded evidence links for
 Graph RAG. It can run as an end-to-end research pipeline or select a compact,
 fixed-budget evidence set from candidates produced by an existing retriever.
 
+<p align="center">
+  <img src="assets/evlink-overview.png" width="100%" alt="EvLink method overview">
+</p>
+<p align="center"><em>EvLink constructs source-grounded evidence links, induces a query-local evidence region, and selects compact support through evidence-need coverage.</em></p>
+
 > [!NOTE]
 > The Python distribution and import package are named `evidencelink`.
 
