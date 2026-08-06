@@ -1,0 +1,19 @@
+include LICENSE
+include README.md
+include ARTIFACTS.md
+include CITATION.cff
+include CONTRIBUTING.md
+include SECURITY.md
+include pyproject.toml
+recursive-include evidencelink *.py *.json
+recursive-include examples *.py *.jsonl
+recursive-include scripts *.py
+include datasets/README.md
+include datasets/raw/.gitkeep
+recursive-include datasets/fixtures *.json
+recursive-include docs *.md
+recursive-include reproduce *.md *.json
+recursive-exclude tests *
+global-exclude *.py[cod]
+global-exclude __pycache__
+global-exclude .DS_Store

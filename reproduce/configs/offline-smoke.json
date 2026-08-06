@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "description": "Deterministic one-query EvidenceLink artifact smoke run.",
+  "inputs": {
+    "corpus": "examples/corpus.jsonl",
+    "questions": "examples/questions.jsonl"
+  },
+  "workdir": "runs/reproduce/offline-smoke",
+  "pipeline": {
+    "dataset": "demo",
+    "reader_budget_k": 2,
+    "stability_window_m": 1,
+    "pool_k": 20,
+    "dense_top_k": 10,
+    "max_hops": 2,
+    "openie_mode": "simple",
+    "evidence_need_mode": "anchor_list",
+    "binding_mode": "simple",
+    "binding_model": "simple-binding",
+    "embedding_name": "deterministic-hash",
+    "embedding_base_url": "offline",
+    "force": true
+  }
+}

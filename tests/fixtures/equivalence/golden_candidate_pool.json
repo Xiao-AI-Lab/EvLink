@@ -1,0 +1,30 @@
+{
+  "candidate_doc_ids": [
+    "0",
+    "1",
+    "2"
+  ],
+  "candidate_titles": [
+    "Darling Mills Creek",
+    "Parramatta River",
+    "Sydney Harbour"
+  ],
+  "paths": {
+    "0": [
+      "0"
+    ],
+    "1": [
+      "0",
+      "1"
+    ],
+    "2": [
+      "0",
+      "1",
+      "2"
+    ]
+  },
+  "required_witness_relations": [
+    "drains to",
+    "main tributary of"
+  ]
+}

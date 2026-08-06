@@ -1,0 +1,12 @@
+[
+  {
+    "_id": "toy-1",
+    "question": "Where was the founder of Acme Corporation born?",
+    "answer": "Singapore",
+    "context": [
+      ["Acme Corporation", ["Acme Corporation was founded by Alice Chen."]],
+      ["Alice Chen", ["Alice Chen was born in Singapore."]]
+    ],
+    "supporting_facts": [["Acme Corporation", 0], ["Alice Chen", 0]]
+  }
+]

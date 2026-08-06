@@ -1,0 +1,44 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Test public package
+        run: >-
+          python -m pytest
+          tests/test_contract_and_metrics.py
+          tests/test_datasets.py
+          tests/test_download_datasets.py
+          tests/test_evidence_selection.py
+          tests/test_golden_equivalence.py
+          tests/test_integrations.py
+          tests/test_paper_facing_api.py
+          tests/test_pipeline_artifacts.py
+          tests/test_reproduce_config.py
+          tests/test_selector_api.py
+          -q
+      - name: Run offline examples
+        run: |
+          python examples/end_to_end.py
+          python examples/external_retriever.py
+          python examples/integrations/hipporag.py
+          python examples/integrations/lightrag.py

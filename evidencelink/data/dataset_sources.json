@@ -1,0 +1,46 @@
+{
+  "manifest_version": 1,
+  "mirror": {
+    "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+    "revision": "c617143f01477243992a63b2e2151cc003dd3b21",
+    "notes": "The automatic entries are checksum-identical mirrors of the compact paper benchmark files previously used by EvidenceLink. Dataset licenses remain governed by the original dataset owners."
+  },
+  "datasets": {
+    "2wikimultihopqa": {
+      "upstream": "https://github.com/Alab-NII/2wikimultihop",
+      "license": "Apache-2.0",
+      "files": [
+        {"filename": "2wikimultihopqa.json", "url": "https://raw.githubusercontent.com/OSU-NLP-Group/HippoRAG/c617143f01477243992a63b2e2151cc003dd3b21/reproduce/dataset/2wikimultihopqa.json", "sha256": "895cba294064df0c3302c76847b1fc08d99b5619f7663dfaa3b65cd780f1cac4"},
+        {"filename": "2wikimultihopqa_corpus.json", "url": "https://raw.githubusercontent.com/OSU-NLP-Group/HippoRAG/c617143f01477243992a63b2e2151cc003dd3b21/reproduce/dataset/2wikimultihopqa_corpus.json", "sha256": "9d6e352952aafb18dab22bf8195039461321a44a949df902ae83bce134ad238a"}
+      ]
+    },
+    "hotpotqa": {
+      "upstream": "https://hotpotqa.github.io/",
+      "license": "See upstream dataset terms",
+      "files": [
+        {"filename": "hotpotqa.json", "url": "https://raw.githubusercontent.com/OSU-NLP-Group/HippoRAG/c617143f01477243992a63b2e2151cc003dd3b21/reproduce/dataset/hotpotqa.json", "sha256": "3ad9c0bcbf93f41d7004ca6007049c904d2605046b314a2f7ecfb379c64cba6d"},
+        {"filename": "hotpotqa_corpus.json", "url": "https://raw.githubusercontent.com/OSU-NLP-Group/HippoRAG/c617143f01477243992a63b2e2151cc003dd3b21/reproduce/dataset/hotpotqa_corpus.json", "sha256": "9333647b922382776cd2cb02893b390d77984df85a91bfa8be411284978aca7d"}
+      ]
+    },
+    "musique": {
+      "upstream": "https://github.com/StonyBrookNLP/musique",
+      "license": "CC-BY-4.0",
+      "files": [
+        {"filename": "musique.json", "url": "https://raw.githubusercontent.com/OSU-NLP-Group/HippoRAG/c617143f01477243992a63b2e2151cc003dd3b21/reproduce/dataset/musique.json", "sha256": "98ed4e21d3076532f6388d42320fb809599c63a0d8dffca8ece5e41922be6b46"},
+        {"filename": "musique_corpus.json", "url": "https://raw.githubusercontent.com/OSU-NLP-Group/HippoRAG/c617143f01477243992a63b2e2151cc003dd3b21/reproduce/dataset/musique_corpus.json", "sha256": "73157a03ce3f0b1a5673dd5dc12bb970c24976dbffc688af9eecdd758c97ffcb"}
+      ]
+    },
+    "nq_rear": {
+      "upstream": "https://ai.google.com/research/NaturalQuestions",
+      "license": "See upstream dataset terms",
+      "notes": "EvidenceLink expects the HippoRAG-style 1K query and corpus files. No stable checksum-pinned public mirror has been approved for automatic download.",
+      "files": []
+    },
+    "popqa": {
+      "upstream": "https://github.com/AlexTMallen/adaptive-retrieval",
+      "license": "MIT repository; verify dataset terms before redistribution",
+      "notes": "EvidenceLink expects the HippoRAG-style 1K query and corpus files. No stable checksum-pinned public mirror has been approved for automatic download.",
+      "files": []
+    }
+  }
+}

@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use EvidenceLink, please cite this software and the associated paper."
+title: "EvidenceLink: Source-Grounded Evidence Linking for Graph RAG"
+type: software
+authors:
+  - name: "Xiao AI Lab contributors"
+version: 0.1.0
+date-released: 2026-08-06
+license: MIT
+repository-code: "https://github.com/Xiao-AI-Lab/EvLink"
+url: "https://github.com/Xiao-AI-Lab/EvLink"
+abstract: >-
+  A research SDK for source-grounded evidence-link retrieval and
+  coverage-aware fixed-budget evidence selection in retrieval-augmented
+  generation systems.
+keywords:
+  - retrieval-augmented generation
+  - graph retrieval
+  - evidence selection
+  - multi-hop question answering
+notes: >-
+  The paper citation will be added when a stable public bibliographic record
+  is available.

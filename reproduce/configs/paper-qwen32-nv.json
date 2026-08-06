@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "description": "Public model-backed protocol template for a Qwen 32B-compatible LLM and an NV embedding endpoint.",
+  "inputs": {
+    "corpus": "runs/datasets/2wikimultihopqa/corpus.jsonl",
+    "questions": "runs/datasets/2wikimultihopqa/questions.jsonl"
+  },
+  "workdir": "runs/reproduce/paper-qwen32-nv/2wikimultihopqa",
+  "pipeline": {
+    "dataset": "2wikimultihopqa",
+    "reader_budget_k": 5,
+    "stability_window_m": 4,
+    "pool_k": 100,
+    "dense_top_k": 20,
+    "max_hops": 2,
+    "openie_mode": "llm",
+    "evidence_need_mode": "llm",
+    "binding_mode": "llm",
+    "openie_model": "$EVLINK_LLM_MODEL",
+    "evidence_need_model": "$EVLINK_LLM_MODEL",
+    "binding_model": "$EVLINK_LLM_MODEL",
+    "llm_base_url": "$EVLINK_LLM_BASE_URL",
+    "api_key": "$EVLINK_API_KEY",
+    "embedding_name": "$EVLINK_EMBEDDING_MODEL",
+    "embedding_base_url": "$EVLINK_EMBEDDING_BASE_URL",
+    "embedding_batch_size": 8,
+    "timeout": 120.0,
+    "force": false
+  }
+}
