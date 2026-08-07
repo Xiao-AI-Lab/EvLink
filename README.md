@@ -78,6 +78,8 @@ See [reproduce/README.md](reproduce/README.md) for the reproduction protocol,
 [docs/RELEASE_SCOPE.md](docs/RELEASE_SCOPE.md) for the v0.1 release boundary.
 The post-v0.1 application plan is documented in
 [docs/ROADMAP.md](docs/ROADMAP.md).
+The versioned Studio projection is documented in
+[docs/QUERY_RESULT_VIEW.md](docs/QUERY_RESULT_VIEW.md).
 
 ## 🔌 Retriever Integration
 
@@ -287,6 +289,20 @@ The main artifact formats are summarized in [ARTIFACTS.md](ARTIFACTS.md).
 Facts are grounding material for evidence links; passages remain retrieval
 states. The candidate pool `C_q` is not the final evidence set. The final
 evidence set `R_q` is produced by coverage-aware evidence selection.
+
+Build the application-facing `QueryResultView/v1` after reader inference:
+
+```bash
+evidencelink-build-view \
+  --query-id QUERY_ID \
+  --candidate-pool candidate_pool.jsonl \
+  --selection evidence_selection.json \
+  --reader reader_qa.json \
+  --output query_result_view.json
+```
+
+Studio consumers should use this projection instead of parsing raw selection
+traces.
 
 ## ✅ Maintained Examples
 

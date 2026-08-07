@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Xiao-AI-Lab/EvLink/schemas/query_result_view_v1.schema.json",
+  "title": "EvLink QueryResultView/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_schema_version", "query_id", "question", "answer",
+    "needs", "passages", "support_matrix", "evidence_graph",
+    "retrieval_trace", "selection_trace", "provenance"
+  ],
+  "properties": {
+    "artifact_schema_version": {"const": "query_result_view/v1"},
+    "query_id": {"type": "string", "minLength": 1},
+    "question": {"type": "string", "minLength": 1},
+    "answer": {
+      "type": "object",
+      "required": ["text", "citations", "claims"],
+      "properties": {
+        "text": {"type": "string"},
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["marker", "passage_id"],
+            "properties": {
+              "marker": {"type": "string"},
+              "passage_id": {"type": "string"},
+              "passage_position": {"type": "integer", "minimum": 0},
+              "passage_title": {"type": "string"}
+            },
+            "additionalProperties": true
+          }
+        },
+        "claims": {"type": ["array", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "needs": {"type": "array", "items": {"type": "object"}},
+    "passages": {"type": "array", "items": {"type": "object", "required": ["passage_id", "position", "title", "roles"]}},
+    "support_matrix": {"type": "array", "items": {"type": "object", "required": ["need_id", "passage_id", "support_score"]}},
+    "evidence_graph": {"type": "object", "required": ["nodes", "edges"]},
+    "retrieval_trace": {"type": "object", "required": ["schema_version", "capabilities", "discovery_events"]},
+    "selection_trace": {"type": "object", "required": ["schema_version", "baseline_positions", "final_positions"]},
+    "provenance": {"type": "object"}
+  }
+}

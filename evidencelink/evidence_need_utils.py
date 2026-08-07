@@ -47,6 +47,64 @@ class EvidenceNeedBinding:
 
 
 MAX_EVIDENCE_NEED_BINDINGS = 25
+SUPPORT_MATRIX_SCHEMA_VERSION = "need_passage_support/v1"
+
+
+def _coverage_for_requirement(scores: np.ndarray, positions: Sequence[int]) -> float:
+    valid = [int(pos) for pos in positions if 0 <= int(pos) < scores.size]
+    if not valid:
+        return 0.0
+    selected = np.clip(scores[valid], 0.0, 1.0)
+    return float(1.0 - np.prod(1.0 - selected))
+
+
+def _support_matrix_rows(
+    *,
+    active_requirements: Sequence[EvidenceNeed],
+    phi: np.ndarray,
+    binding_idx: int,
+    binding: EvidenceNeedBinding,
+    pool_doc_titles: Sequence[str],
+    baseline_positions: Sequence[int],
+    final_positions: Sequence[int],
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    baseline_set = {int(pos) for pos in baseline_positions}
+    final_set = {int(pos) for pos in final_positions}
+    assignments = binding.assignment_map()
+    for req_idx, requirement in enumerate(active_requirements):
+        scores = np.clip(phi[req_idx, binding_idx, :], 0.0, 1.0)
+        baseline_coverage = _coverage_for_requirement(scores, baseline_positions)
+        final_coverage = _coverage_for_requirement(scores, final_positions)
+        for pos, title in enumerate(pool_doc_titles[: scores.size]):
+            baseline_without = [item for item in baseline_positions if int(item) != int(pos)]
+            final_without = [item for item in final_positions if int(item) != int(pos)]
+            rows.append(
+                {
+                    "need_id": str(requirement.unit_id),
+                    "passage_position": int(pos),
+                    "passage_title": str(title),
+                    "support_score": round(float(scores[pos]), 6),
+                    "baseline_selected": bool(pos in baseline_set),
+                    "final_selected": bool(pos in final_set),
+                    "baseline_coverage_delta": round(
+                        float(baseline_coverage - _coverage_for_requirement(scores, baseline_without))
+                        if pos in baseline_set
+                        else 0.0,
+                        6,
+                    ),
+                    "final_coverage_delta": round(
+                        float(final_coverage - _coverage_for_requirement(scores, final_without))
+                        if pos in final_set
+                        else 0.0,
+                        6,
+                    ),
+                    "selected_binding_id": str(binding.binding_id),
+                    "binding_assignment": assignments.get(str(requirement.unit_id)) or None,
+                    "supporting_bindings": [],
+                }
+            )
+    return rows
 
 
 def _strip_think_tags(text: str) -> str:
@@ -2482,6 +2540,16 @@ def select_coverage_aware_positions(
             ]
             for req_id, rows in binding_candidates_by_req.items()
         },
+        "support_matrix_schema_version": SUPPORT_MATRIX_SCHEMA_VERSION,
+        "support_matrix": _support_matrix_rows(
+            active_requirements=active_requirements,
+            phi=phi,
+            binding_idx=best_binding_idx,
+            binding=best_binding,
+            pool_doc_titles=pool_doc_titles,
+            baseline_positions=baseline_positions,
+            final_positions=best_positions,
+        ),
         "objective": round(float(best_objective), 6),
         "rebuild_objective": round(float(rebuild_objective), 6),
         "baseline_objective": round(float(baseline_objective), 6),

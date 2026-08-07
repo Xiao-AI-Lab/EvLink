@@ -11,6 +11,7 @@ One end-to-end run writes these artifacts in dependency order:
 | `binding_cache.json` | JSON | Support strings keyed by need/candidate/model/prompt identity. |
 | `evidence_selection.json` | JSON | Final fixed-budget evidence sets `R_q`, traces, and aggregates. |
 | `reader_qa.json` | JSON | Optional reader predictions and EM/F1 aggregates. |
+| `query_result_view.json` | JSON | Versioned per-query application projection for Studio. |
 
 ## Required Identity Fields
 
@@ -22,6 +23,9 @@ One end-to-end run writes these artifacts in dependency order:
   provenance.
 - EvLink-built graph candidates may contain `path` and `edge_evidence`;
   adapters do not synthesize these fields from third-party graph metadata.
+- New self-index pools distinguish anchor and dense seeds and persist ordered
+  discovery events with complete per-hop link witnesses.
+- New reader rows retain `query_id` and passage-level citations.
 
 ## Selection Output
 
@@ -33,3 +37,4 @@ top-K evidence documents/titles/IDs, retrieval metrics, and the selection trace.
 The schema is inspectable JSON rather than a pickle. Consumers should tolerate
 additional fields but must not reinterpret `candidate_pool` as the final reader
 evidence set. Full field descriptions are in [../ARTIFACTS.md](../ARTIFACTS.md).
+Studio must consume `QueryResultView/v1`, not these internal traces directly.

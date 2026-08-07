@@ -82,6 +82,9 @@ database, PDF parsing, and application-specific view models.
 
 ## Milestone 1: Versioned Application Contract
 
+Status: implemented on `milestone-1-query-result-view`; pending review and
+merge into `main`.
+
 Create an additive projection layer under `evidencelink/view/`. Studio must
 consume this public view model instead of parsing internal traces directly.
 

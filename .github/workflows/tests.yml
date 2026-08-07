@@ -34,7 +34,9 @@ jobs:
           tests/test_paper_facing_api.py
           tests/test_pipeline_artifacts.py
           tests/test_reproduce_config.py
+          tests/test_reader_qa.py
           tests/test_selector_api.py
+          tests/test_query_result_view.py
           -q
       - name: Run offline examples
         run: |

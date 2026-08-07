@@ -10,6 +10,8 @@ from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 
+from evidencelink.binding import binding_cache_key
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SCRIPT_DIR = ROOT_DIR / "scripts"
 if str(SCRIPT_DIR) not in sys.path:
@@ -172,6 +174,40 @@ class CoverageUtilityProvider:
             evidence_link_metadata=dict(state.pool_trace or {}),
             selection_label_override="coverage_aware_evidence_selection",
         )
+        requirements_by_id = {str(req.unit_id): req for req in requirements}
+        support_matrix = []
+        for raw_row in list(selection_trace.get("support_matrix") or []):
+            if not isinstance(raw_row, Mapping):
+                continue
+            row = dict(raw_row)
+            requirement = requirements_by_id.get(str(row.get("need_id") or ""))
+            try:
+                passage_position = int(row.get("passage_position", -1))
+            except (TypeError, ValueError):
+                passage_position = -1
+            supporting_bindings: list[str] = []
+            if requirement is not None and 0 <= passage_position < len(state.pool_docs):
+                row["passage_id"] = (
+                    str(state.pool_doc_ids[passage_position])
+                    if passage_position < len(state.pool_doc_ids)
+                    and state.pool_doc_ids[passage_position] is not None
+                    else str(passage_position)
+                )
+                cache_key = binding_cache_key(
+                    model=self.binding_model,
+                    subquery=str(requirement.subquery),
+                    passage=str(state.pool_docs[passage_position]),
+                )
+                supporting_bindings = [
+                    str(item)
+                    for item in list(self.binding_cache.get(cache_key) or [])
+                    if str(item).strip()
+                ]
+            elif "passage_id" not in row:
+                row["passage_id"] = str(passage_position)
+            row["supporting_bindings"] = supporting_bindings
+            support_matrix.append(row)
+        selection_trace["support_matrix"] = support_matrix
         return [int(pos) for pos in selected_positions], dict(selection_trace)
 
     def summary(self) -> dict[str, Any]:

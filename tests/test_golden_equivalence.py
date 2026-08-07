@@ -63,6 +63,22 @@ def test_query_local_candidate_pool_matches_golden_path(tmp_path: Path) -> None:
     assert [item["doc_id"] for item in record["candidate_pool"][:3]] == golden["candidate_doc_ids"]
     assert [item["title"] for item in record["candidate_pool"][:3]] == golden["candidate_titles"]
     assert record["local_subgraph"]["paths"] == golden["paths"]
+    assert record["anchor_seed_doc_ids"]
+    assert record["dense_seed_doc_ids"]
+    events = record["local_subgraph"]["discovery_events"]
+    assert [event["step"] for event in events] == list(range(1, len(events) + 1))
+    bridge_event = next(event for event in events if event["doc_id"] == "2")
+    assert bridge_event["discovery_method"] == "bfs"
+    assert bridge_event["depth"] == 2
+    assert bridge_event["parent_doc_id"] == "1"
+    assert len(bridge_event["path_links"]) == 2
+    assert bridge_event["path_links"][-1]["witnesses"]
+    assert len(bridge_event["path_hops"]) == 2
+    assert all(hop["links"] for hop in bridge_event["path_hops"])
+    assert any(
+        link["link_type"] == "relation_grounded"
+        for link in bridge_event["incoming_links"]
+    )
     relations = {
         str(witness.get("relation"))
         for item in record["candidate_pool"]

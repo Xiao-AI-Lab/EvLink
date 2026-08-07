@@ -91,6 +91,12 @@ Main fields:
 - `pool_doc_ids`;
 - `pool_doc_scores`.
 
+Self-index candidate pools also include `anchor_seed_doc_ids`,
+`dense_seed_doc_ids`, and ordered `local_subgraph.discovery_events`. Each event
+records the discovery method, depth, parent, path, and every source-grounded
+link and witness on the traversed hop. External adapters explicitly omit these
+capabilities instead of synthesizing them from third-party graph metadata.
+
 Each candidate includes:
 
 - `rank`;
@@ -162,6 +168,12 @@ protected by the rank-stability guard. They are not dense or anchor retrieval
 seeds. The legacy aliases `stable_seed_positions` and `stable_seed_titles` are
 retained throughout v0.x for artifact compatibility.
 
+`raw_selection_trace.support_matrix` uses schema
+`need_passage_support/v1`. Each cell identifies a need and passage and records
+the selector's actual support score, baseline/final membership, marginal
+coverage deltas, selected binding, and extracted support strings. Application
+code should consume the normalized matrix in `QueryResultView/v1`.
+
 ## Reader Artifact
 
 ### `reader_qa.json`
@@ -176,3 +188,15 @@ Main fields:
 
 Reader evaluation depends on the provided gold answers and the configured
 reader model.
+Each new reader row includes `query_id` and passage-level `citations`; claim
+segmentation remains optional.
+
+## Application Projection
+
+### `query_result_view.json`
+
+`QueryResultView/v1` joins one query across candidate-pool, selection, and
+reader artifacts. It contains the cited answer, evidence needs, passages,
+support matrix, query-local evidence graph, retrieval events, selection
+projection, capability flags, and provenance. Its JSON Schema is packaged at
+`evidencelink/view/schemas/query_result_view_v1.schema.json`.

@@ -136,6 +136,8 @@ class CandidatePoolRecord:
     anchors: tuple[str, ...]
     seed_doc_ids: tuple[str, ...]
     candidate_pool: tuple[CandidateEvidence, ...]
+    anchor_seed_doc_ids: tuple[str, ...] = ()
+    dense_seed_doc_ids: tuple[str, ...] = ()
     gold_doc_ids: tuple[str, ...] = ()
     gold_titles: tuple[str, ...] = ()
     gold_answers: tuple[str, ...] = ()
@@ -148,6 +150,8 @@ class CandidatePoolRecord:
             "question": self.question,
             "anchors": list(self.anchors),
             "seed_doc_ids": list(self.seed_doc_ids),
+            "anchor_seed_doc_ids": list(self.anchor_seed_doc_ids),
+            "dense_seed_doc_ids": list(self.dense_seed_doc_ids),
             "candidate_pool": [item.to_mapping() for item in self.candidate_pool],
             "gold_doc_ids": list(self.gold_doc_ids),
             "gold_docs": list(self.gold_doc_ids),
@@ -162,6 +166,8 @@ class CandidatePoolRecord:
                 "input_method": MAIN_UPSTREAM_RETRIEVER_NAME,
                 "anchors": list(self.anchors),
                 "seed_doc_ids": list(self.seed_doc_ids),
+                "anchor_seed_doc_ids": list(self.anchor_seed_doc_ids),
+                "dense_seed_doc_ids": list(self.dense_seed_doc_ids),
                 "local_subgraph": dict(self.local_subgraph),
             },
         }

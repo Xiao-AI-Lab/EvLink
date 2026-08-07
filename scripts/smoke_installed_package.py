@@ -5,7 +5,11 @@ from __future__ import annotations
 
 import json
 
-from evidencelink import EvidenceSelector, EvidenceSelectorConfig
+from evidencelink import (
+    EvidenceSelector,
+    EvidenceSelectorConfig,
+    load_query_result_view_schema,
+)
 from evidencelink.integrations import candidates_from_hipporag
 
 
@@ -26,4 +30,5 @@ result = EvidenceSelector(
 )
 assert len(result.evidence) == 2
 assert result.trace["input_method"] == "external_retriever"
+assert load_query_result_view_schema()["title"] == "EvLink QueryResultView/v1"
 print(json.dumps({"version": __import__("evidencelink").__version__, "evidence": 2}))

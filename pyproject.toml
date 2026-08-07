@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "evidencelink"
-version = "0.1.0"
+version = "0.2.0.dev0"
 description = "EvLink source-grounded evidence linking for Graph RAG and multi-hop question answering."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -42,7 +42,7 @@ Repository = "https://github.com/Xiao-AI-Lab/EvLink"
 Issues = "https://github.com/Xiao-AI-Lab/EvLink/issues"
 
 [project.optional-dependencies]
-dev = ["build>=1", "pytest>=7", "twine>=5"]
+dev = ["build>=1", "jsonschema>=4", "pytest>=7", "twine>=5"]
 
 [project.scripts]
 evidencelink-pipeline = "evidencelink.run_pipeline:main"
@@ -50,9 +50,10 @@ evidencelink-prepare-dataset = "evidencelink.prepare_dataset:main"
 evidencelink-select = "evidencelink.run_evidence_selection:main"
 evidencelink-reader-qa = "evidencelink.reader_qa:main"
 evidencelink-download-datasets = "evidencelink.download_datasets:main"
+evidencelink-build-view = "evidencelink.view.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["evidencelink*"]
 
 [tool.setuptools.package-data]
-evidencelink = ["data/*.json"]
+evidencelink = ["data/*.json", "view/schemas/*.json"]

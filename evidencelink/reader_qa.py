@@ -57,7 +57,9 @@ def build_prompt(question: str, passages: Sequence[str]) -> list[dict[str, str]]
         context.append(f"[{idx}] {str(passage).strip()}")
     user = (
         "Answer the question using only the provided Wikipedia passages. "
-        "Return a concise answer after 'Answer:'.\n\n"
+        "Return a concise answer after 'Answer:'. On the next line, return "
+        "'Citations:' followed by one or more passage markers such as [1] [2]. "
+        "Cite only passages that support the answer.\n\n"
         + "\n\n".join(context)
         + f"\n\nQuestion: {question}\nThought: "
     )
@@ -84,8 +86,29 @@ def chat_completion(*, base_url: str, model: str, api_key: str, messages: Sequen
 
 
 def extract_answer(response: str) -> str:
-    match = re.search(r"Answer:\s*(.*)", str(response), flags=re.IGNORECASE | re.DOTALL)
+    match = re.search(
+        r"Answer:\s*(.*?)(?:\s+(?:Citations?|Sources?):|$)",
+        str(response),
+        flags=re.IGNORECASE | re.DOTALL,
+    )
     return match.group(1).strip() if match else str(response).strip()
+
+
+def extract_citation_positions(response: str, *, passage_count: int) -> list[int]:
+    citation_match = re.search(
+        r"(?:Citations?|Sources?):\s*(.*)",
+        str(response),
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    citation_text = citation_match.group(1) if citation_match else str(response)
+    positions: list[int] = []
+    seen: set[int] = set()
+    for raw_number in re.findall(r"\[(\d+)\]", citation_text):
+        position = int(raw_number) - 1
+        if 0 <= position < int(passage_count) and position not in seen:
+            seen.add(position)
+            positions.append(position)
+    return positions
 
 
 def run_reader(args: argparse.Namespace) -> dict[str, Any]:
@@ -106,16 +129,30 @@ def run_reader(args: argparse.Namespace) -> dict[str, Any]:
             timeout=float(args.timeout),
         )
         answer = extract_answer(response)
+        citation_positions = extract_citation_positions(response, passage_count=len(passages))
         gold_answers = [str(item) for item in list(row.get("gold_answers") or [])]
+        retrieved_ids = list(row.get("retrieved_doc_indices_top5") or [])[: int(args.qa_top_k)]
+        retrieved_titles = list(row.get("retrieved_titles_top5") or [])[: int(args.qa_top_k)]
+        citations = [
+            {
+                "marker": f"[{position + 1}]",
+                "passage_position": int(position),
+                "passage_id": str(retrieved_ids[position]) if position < len(retrieved_ids) else str(position),
+                "passage_title": str(retrieved_titles[position]) if position < len(retrieved_titles) else "",
+            }
+            for position in citation_positions
+        ]
         outputs.append(
             {
+                "query_id": str(row.get("query_id", row.get("query_index", idx))),
                 "query_index": int(row.get("query_index", idx)),
                 "question": str(row.get("question") or ""),
                 "gold_answers": gold_answers,
                 "prediction": answer,
+                "citations": citations,
                 "em": exact_match(answer, gold_answers),
                 "f1": token_f1(answer, gold_answers),
-                "retrieved_titles_top5": list(row.get("retrieved_titles_top5") or [])[: int(args.qa_top_k)],
+                "retrieved_titles_top5": retrieved_titles,
             }
         )
     return {
