@@ -16,7 +16,6 @@
 </p>
 
 <p><strong>已被 EMNLP 2026 Main Conference 接收</strong></p>
-<p>Linyao Zheng · Xuhang Shi · Zhifang Mao · Sai Zhou · Shuaixian An · Xiuquan Hou</p>
 
 <p><a href="README.md">English</a> | <strong>简体中文</strong></p>
 
@@ -317,8 +316,13 @@ tests/          公开契约与集成测试
 
 ## 📚 引用与联系
 
-EvLink 已被 EMNLP 2026 Main Conference 接收。引用元数据与作者列表见
-[CITATION.cff](CITATION.cff)。终稿论文链接和正式论文集 BibTeX 将在公开书目
-记录可用后补充。
+EvLink 已被 EMNLP 2026 Main Conference 接收。
+
+**作者：** Linyao Zheng、Xuhang Shi、Zhifang Mao、Sai Zhou、Shuaixian An、
+Xiuquan Hou。
+
+引用元数据见 [CITATION.cff](CITATION.cff)。终稿论文链接和正式论文集 BibTeX
+将在公开书目记录可用后补充。
+
 如需报告 bug、咨询集成问题或反馈复现问题，请使用
 [GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues)。
