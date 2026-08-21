@@ -18,6 +18,8 @@
 <p><strong>Accepted to EMNLP 2026 Main Conference</strong></p>
 <p>Linyao Zheng · Xuhang Shi · Zhifang Mao · Sai Zhou · Shuaixian An · Xiuquan Hou</p>
 
+<p><strong>English</strong> | <a href="README.zh-CN.md">简体中文</a></p>
+
 [Quick Start](#-quick-start) · [Retriever Integration](#-retriever-integration) · [Reproduction](#-paper-reproduction) · [Artifacts](#-artifact-contract) · [Citation](#-citation-and-contact)
 
 </div>
