@@ -23,46 +23,47 @@
 
 </div>
 
-EvLink 是一种面向 Graph RAG、基于来源支撑证据链接的图检索器。它既可以
-作为端到端研究流水线运行，也可以从现有检索器产生的候选结果中选出紧凑、
-满足固定预算的证据集合。
+EvLink 是一个面向 Graph RAG 的图检索器。它用有原文依据的证据链接组织段落，
+既能运行完整的研究流水线，也能接在现有检索器后面，从候选结果中挑出一组
+紧凑、篇数可控的证据。
 
 <p align="center">
   <img src="assets/evlink-overview.png" width="100%" alt="EvLink 方法概览">
 </p>
-<p align="center"><em>EvLink 构建由来源支撑的证据链接，归纳查询局部的证据区域，并通过证据需求覆盖选出紧凑的支持证据。</em></p>
+<p align="center"><em>EvLink 用有原文依据的链接连接段落，先找回当前问题需要的局部证据，再根据证据需求覆盖选出紧凑的支持集合。</em></p>
 
 > [!NOTE]
-> Python 发行包与导入包均命名为 `evidencelink`。
+> PyPI 包名和 Python 导入名都是 `evidencelink`。
 
 ## ✨ 核心特点
 
-- 🔗 **来源支撑的链接**为图遍历保留段落级见证信息；
-- 🎯 **覆盖感知选择**围绕问题的证据需求，在固定 reader 预算内组织证据；
-- 🔌 **检索器接入**接收稠密、稀疏或图检索器输出的有序候选，无需用户替换
-  现有技术栈。
+- 🔗 **链接有据可查**：每条链接都保留段落级依据，图遍历结果可以回到原文核查；
+- 🎯 **按问题补齐证据**：在固定篇数内覆盖问题的不同证据需求，减少
+  重复和无效候选；
+- 🔌 **可以接入现有检索器**：直接接收稠密、稀疏或图检索器给出的有序候选，
+  不必推翻现有检索链路。
 
-本包提供明确的产物结构（schema）、确定性的端到端冒烟示例，以及可检查的
-选择轨迹。
+仓库为各阶段定义了清晰的产物格式，每一步选择都有轨迹可查，并附带一个完全
+离线、结果固定的端到端示例。
 
-随附的冒烟示例有意保持小规模和确定性；将示例输入替换为对应的已准备产物，
-即可运行基准评测。
+这个示例刻意做得很小，方便先确认环境和流程。要跑正式评测，只需把示例输入
+换成准备好的数据集产物。
 
 ## 🧭 流水线
 
-公开流水线从头到尾沿用论文术语：
+整体流程与论文中的定义一致：
 
 ```text
 语料 + 问题
   -> OpenIE 事实
-  -> 来源支撑的证据链接索引
-  -> 查询局部证据归纳
+  -> 构建有原文依据的证据链接索引
+  -> 找回当前查询的局部证据区域
   -> 候选池 C_q
   -> 证据需求 B(q)
   -> 支持度缓存
-  -> 覆盖感知的证据选择
+  -> 按覆盖情况选择证据
   -> 最终证据集合 R_q
-  -> 可选的 reader 问答
+  -> 可选的答案生成
 ```
 
 ## ⚡ 快速开始
@@ -76,15 +77,16 @@ pip install -e ".[dev]"
 python examples/end_to_end.py
 ```
 
-复现协议见 [reproduce/README.md](reproduce/README.md)，产物格式见
-[ARTIFACTS.md](ARTIFACTS.md)，v0.1 发布边界见
-[docs/RELEASE_SCOPE.md](docs/RELEASE_SCOPE.md)。v0.1 之后的应用计划记录在
-[docs/ROADMAP.md](docs/ROADMAP.md) 中。
+更多细节可以继续看：复现步骤在 [reproduce/README.md](reproduce/README.md)，
+各类中间产物的字段定义在 [ARTIFACTS.md](ARTIFACTS.md)，v0.1 的发布范围在
+[docs/RELEASE_SCOPE.md](docs/RELEASE_SCOPE.md)。后续应用层计划记录在
+[docs/ROADMAP.md](docs/ROADMAP.md)。
 
 ## 🔌 检索器接入
 
-将有序候选列表传给 `EvidenceSelector`。默认路径离线且具有确定性；通过
-`EvidenceSelectorConfig` 可以启用模型驱动的证据需求与绑定。
+如果已经有自己的检索器，不必重建整套系统。把按相关性排序的候选列表交给
+`EvidenceSelector` 即可。默认实现完全离线、可复现；需要时也可以通过
+`EvidenceSelectorConfig` 启用模型，让它抽取证据需求并判断候选是否提供支持。
 
 ```python
 from evidencelink import EvidenceSelector, EvidenceSelectorConfig
@@ -115,35 +117,22 @@ print(result.evidence_needs)
 print(result.trace)
 ```
 
-运行完整示例：
+完整示例可以直接运行：
 
 ```bash
 python examples/external_retriever.py
 ```
 
-传入 `workdir="runs/selection"` 可保留候选池、证据需求、绑定缓存和选择产物，
-便于检查。外部候选会被视为兼容性输入；只有 EvLink 索引生成的候选才带有
-本方法的来源支撑链接来源信息（provenance）。
-
-本项目包含适配当前 HippoRAG 和 LightRAG 结果结构的无依赖适配器（adapter）。
-EvLink 不会安装或导入这两个第三方包：
-
-```python
-from evidencelink import candidates_from_hipporag, candidates_from_lightrag
-
-hipporag_candidates = candidates_from_hipporag(retrieval_result)
-lightrag_candidates = candidates_from_lightrag(query_result)
-```
-
-离线示例位于 `examples/integrations/hipporag.py` 和
-`examples/integrations/lightrag.py`。适配器会保留上游元数据（metadata），
-但不会合成 EvLink 的边见证信息。
+设置 `workdir="runs/selection"` 后，EvLink 会把候选池、证据需求、支持度缓存
+和最终选择结果全部落盘，方便排查和复现实验。需要注意，外部候选只是二阶段
+选择器的输入；只有 EvLink 索引生成的候选才带有本方法定义的链接来源信息
+（provenance）。
 
 ## 🧪 论文复现
 
-将 EvLink 接入其他基准或论文复现工作流时，请使用 `evidencelink.api`。
-API 名称与论文产物保持一致：候选池 `C_q`、证据需求 `B(q)`、支持度缓存和
-最终证据集合 `R_q`。
+做基准评测或复现论文时，建议直接使用 `evidencelink.api`。API 名称与论文
+一一对应：候选池 `C_q`、证据需求 `B(q)`、支持度缓存，以及最终证据集合
+`R_q`。
 
 ```python
 from evidencelink import PaperPipelineConfig, run_paper_pipeline
@@ -159,7 +148,7 @@ print(result["selection"])
 print(result["selection_summary"])
 ```
 
-安装后的 runner 也提供同样的接口边界：
+安装包后，也可以通过命令行运行同一套流程：
 
 ```bash
 evidencelink-pipeline \
@@ -172,7 +161,7 @@ evidencelink-pipeline \
 
 ## 🗂️ 基准数据集
 
-EvLink 为论文使用的五个基准提供了轻量级注册表和转换器：
+项目内置了论文中五个数据集的注册信息和格式转换工具：
 
 | 数据集 | 规范名称 | 源格式 |
 | --- | --- | --- |
@@ -182,9 +171,9 @@ EvLink 为论文使用的五个基准提供了轻量级注册表和转换器：
 | Natural Questions | `nq_rear` | `contexts` + `is_supporting` |
 | PopQA | `popqa` | `paragraphs` + `is_supporting` |
 
-仓库与 Python 包均不分发基准数据集的源 JSON。项目支持托管下载
-2WikiMultiHopQA、HotpotQA 和 MuSiQue，下载器会自动校验已下载文件。
-NQ-ReAR 和 PopQA 需要手动放置源文件。
+考虑到数据许可和仓库体积，GitHub 仓库与 Python 包都不直接附带原始 JSON。
+2WikiMultiHopQA、HotpotQA 和 MuSiQue 可以用下面的命令下载，下载完成后会
+自动校验文件；NQ-ReAR 和 PopQA 需要手动准备。
 
 ```bash
 evidencelink-download-datasets --list
@@ -192,8 +181,8 @@ evidencelink-download-datasets \
   --dataset 2wikimultihopqa,hotpotqa,musique
 ```
 
-随后，转换器会读取 `<dataset>.json` 和 `<dataset>_corpus.json`，并写出
-标准的 `corpus.jsonl` 与 `questions.jsonl` 输入：
+下载或放置好源文件后，转换工具会读取 `<dataset>.json` 和
+`<dataset>_corpus.json`，生成统一的 `corpus.jsonl` 与 `questions.jsonl`：
 
 ```bash
 evidencelink-prepare-dataset \
@@ -202,12 +191,13 @@ evidencelink-prepare-dataset \
   --force
 ```
 
-上游使用条款与手动源文件要求见 [datasets/README.md](datasets/README.md)。
+原始数据的使用条款和手动准备要求见
+[datasets/README.md](datasets/README.md)。
 
 ## ▶️ 端到端演示
 
-默认演示路径完全离线：使用简单 OpenIE 抽取器、简单的整题证据需求、简单
-绑定缓存和确定性 embedding。
+默认演示不依赖在线模型：OpenIE、证据需求、支持度判断和 embedding 都使用
+仓库自带的简单确定性实现。
 
 ```bash
 python scripts/run_pipeline.py \
@@ -217,14 +207,14 @@ python scripts/run_pipeline.py \
   --dataset demo
 ```
 
-对应的版本化运行方式为：
+也可以直接运行仓库中固定版本的配置：
 
 ```bash
 python scripts/run_reproduce_config.py reproduce/configs/offline-smoke.json
 ```
 
-对于模型驱动的阶段，将相应阶段切换为 `llm`，并提供 OpenAI-compatible
-端点：
+需要模型能力时，可以把对应阶段单独切换为 `llm`，并提供兼容 OpenAI API
+的服务地址和密钥：
 
 ```bash
 python scripts/run_pipeline.py \
@@ -277,42 +267,41 @@ python scripts/run_evidence_selection.py \
 
 ## 📐 产物契约
 
-主要产物格式汇总在 [ARTIFACTS.md](ARTIFACTS.md) 中。
+各阶段的产物格式都写在 [ARTIFACTS.md](ARTIFACTS.md) 中。
 
-事实是证据链接的依据材料，段落仍然是检索状态。候选池 `C_q` 不是最终证据
-集合；最终证据集合 `R_q` 由覆盖感知的证据选择生成。
+OpenIE 事实只用来说明段落为什么可以相连，真正被检索和选择的单位始终是
+段落。`C_q` 只是候选池，经过覆盖选择后得到的 `R_q` 才是最终送入答案生成
+模型的证据集合。
 
-## ✅ 官方维护示例
+## ✅ 已测试示例
 
-以下示例属于经过测试的 v0.1 契约：
+CI 会持续运行下面两个示例，确保 v0.1 的公开入口保持可用：
 
 | 示例 | 用途 |
 | --- | --- |
-| `examples/end_to_end.py` | 完整的确定性流水线。 |
-| `examples/external_retriever.py` | 通用有序候选接入。 |
-| `examples/integrations/hipporag.py` | HippoRAG 结果结构适配器。 |
-| `examples/integrations/lightrag.py` | LightRAG 结构化结果适配器。 |
+| `examples/end_to_end.py` | 完整、离线且结果固定的流水线。 |
+| `examples/external_retriever.py` | 接入外部检索候选的通用示例。 |
 
 ## 🗃️ 仓库结构
 
 ```text
-evidencelink/   可安装的 SDK
-examples/       官方维护的离线示例
-scripts/        分阶段命令与发布校验命令
-reproduce/      版本化配置与指标定义
-datasets/       玩具样例与源数据准备文档
-tests/          公开契约与集成测试
+evidencelink/   可安装的 Python SDK
+examples/       可以直接运行的离线示例
+scripts/        各阶段命令和发布检查脚本
+reproduce/      固定版本的配置与指标定义
+datasets/       小型测试数据和数据准备说明
+tests/          公开接口与集成测试
 ```
 
 ## 🩺 故障排查
 
-- 默认 embedding 后端是 `deterministic-hash`，端点为 `offline`。
-  切换到模型驱动的 embedding 服务时，需要同时设置 `embedding_name` 和
-  `embedding_base_url`。
-- 模型驱动的 OpenIE、证据需求和绑定阶段需要 OpenAI-compatible 端点
-  与 API key；离线示例不需要。
-- 不要在已有的模型驱动索引中更换 embedding 模型。请重新构建索引，确保
-  文档向量和查询向量位于同一 embedding 空间。
+- 开箱默认使用 `deterministic-hash` embedding，服务地址是 `offline`，因此
+  不需要启动 embedding 服务。切换到真实模型时，请同时设置
+  `embedding_name` 和 `embedding_base_url`。
+- OpenIE、证据需求或支持度判断切换到模型模式后，需要提供兼容 OpenAI API
+  的服务地址和 API key；离线示例不需要。
+- 索引建好后不要直接更换 embedding 模型。换模型时请重建索引，确保文档
+  和查询使用同一个向量空间。
 
 ## 📚 引用与联系
 
@@ -321,8 +310,8 @@ EvLink 已被 EMNLP 2026 Main Conference 接收。
 **作者：** Linyao Zheng、Xuhang Shi、Zhifang Mao、Sai Zhou、Shuaixian An、
 Xiuquan Hou。
 
-引用元数据见 [CITATION.cff](CITATION.cff)。终稿论文链接和正式论文集 BibTeX
-将在公开书目记录可用后补充。
+机器可读的引用信息在 [CITATION.cff](CITATION.cff) 中。终稿论文链接和正式
+论文集 BibTeX 会在公开书目记录发布后补上。
 
-如需报告 bug、咨询集成问题或反馈复现问题，请使用
-[GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues)。
+遇到 bug、接入问题或复现问题，请在
+[GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues) 中反馈。

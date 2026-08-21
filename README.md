@@ -130,20 +130,6 @@ binding-cache, and selection artifacts for inspection. External candidates are
 treated as compatibility inputs; only candidates produced by the EvLink
 index carry the method's source-grounded link provenance.
 
-Dependency-free adapters are included for current HippoRAG and LightRAG result
-shapes. Neither third-party package is installed or imported by EvLink:
-
-```python
-from evidencelink import candidates_from_hipporag, candidates_from_lightrag
-
-hipporag_candidates = candidates_from_hipporag(retrieval_result)
-lightrag_candidates = candidates_from_lightrag(query_result)
-```
-
-Offline examples are available at `examples/integrations/hipporag.py` and
-`examples/integrations/lightrag.py`. Upstream metadata is preserved, but the
-adapters do not synthesize EvLink edge witnesses.
-
 ## 🧪 Paper Reproduction
 
 Use `evidencelink.api` when wiring EvLink into another benchmark or
@@ -301,8 +287,6 @@ The following examples are part of the tested v0.1 contract:
 | --- | --- |
 | `examples/end_to_end.py` | Complete deterministic pipeline. |
 | `examples/external_retriever.py` | Generic ordered candidate integration. |
-| `examples/integrations/hipporag.py` | HippoRAG result-shape adapter. |
-| `examples/integrations/lightrag.py` | LightRAG structured result adapter. |
 
 ## 🗃️ Repository Layout
 
