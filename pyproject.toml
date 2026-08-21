@@ -11,7 +11,12 @@ requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-  { name = "Xiao AI Lab" },
+  { name = "Linyao Zheng" },
+  { name = "Xuhang Shi" },
+  { name = "Zhifang Mao" },
+  { name = "Sai Zhou" },
+  { name = "Shuaixian An" },
+  { name = "Xiuquan Hou" },
 ]
 keywords = [
   "retrieval-augmented generation",
