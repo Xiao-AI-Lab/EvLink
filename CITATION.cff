@@ -1,23 +1,50 @@
 cff-version: 1.2.0
-message: "If you use EvLink, please cite this software and the associated paper."
+message: >-
+  EvLink was accepted to the EMNLP 2026 Main Conference. If you use EvLink,
+  please cite this software; the final proceedings citation will be added after
+  camera-ready publication.
 title: "EvLink: Source-grounded Evidence Linking for Graph RAG"
 type: software
 authors:
-  - name: "Xiao AI Lab contributors"
+  - given-names: "Linyao"
+    family-names: "Zheng"
+  - given-names: "Xuhang"
+    family-names: "Shi"
+  - given-names: "Zhifang"
+    family-names: "Mao"
+  - given-names: "Sai"
+    family-names: "Zhou"
+  - given-names: "Shuaixian"
+    family-names: "An"
+  - given-names: "Xiuquan"
+    family-names: "Hou"
 version: 0.1.0
 date-released: 2026-08-06
 license: MIT
 repository-code: "https://github.com/Xiao-AI-Lab/EvLink"
 url: "https://github.com/Xiao-AI-Lab/EvLink"
 abstract: >-
-  A research SDK for source-grounded evidence-link retrieval and
-  coverage-aware fixed-budget evidence selection in retrieval-augmented
-  generation systems.
+  Graph-based Retrieval-Augmented Generation (GraphRAG) supports multi-hop
+  reasoning by organizing corpora into structured graphs. However, graph
+  reachability often captures semantic association rather than evidence
+  support, so a reachable passage may still fail to justify a required
+  cross-passage transition. We propose EvLink, an evidence-linking retriever
+  that preserves passages as retrievable evidence units and builds
+  evidence-supported transitions between them. EvLink constructs two types of
+  reliable links: relation-grounded evidence links justified by explicit
+  source relations, and endpoint-alignment links serving as source-bounded
+  fallbacks. For retrieval, we introduce a two-stage retrieval strategy.
+  First, bounded breadth-first search over source-grounded evidence links
+  recovers bridge passages missed by similarity-based methods. Then,
+  evidence-need mining with noisy-OR coverage refinement selects a compact,
+  non-redundant evidence set satisfying distinct question facets. Experiments
+  on three multi-hop and two simple QA benchmarks show EvLink consistently
+  outperforms leading GraphRAG baselines with average gains of 2.4 R@5, 1.9 EM,
+  and 2.4 F1.
 keywords:
-  - retrieval-augmented generation
-  - graph retrieval
-  - evidence selection
-  - multi-hop question answering
-notes: >-
-  The paper citation will be added when a stable public bibliographic record
-  is available.
+  - "Graph Retrieval-Augmented Generation"
+  - "Evidence Linking"
+  - "Source-grounded Retrieval"
+  - "Multi-hop Question Answering"
+  - "EMNLP 2026 Main Conference"
+  - "Information Retrieval and Text Mining"

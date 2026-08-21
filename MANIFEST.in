@@ -1,5 +1,6 @@
 include LICENSE
 include README.md
+include README.zh-CN.md
 include ARTIFACTS.md
 include CITATION.cff
 include CONTRIBUTING.md
