@@ -16,7 +16,6 @@
 </p>
 
 <p><strong>Accepted to EMNLP 2026 Main Conference</strong></p>
-<p>Linyao Zheng · Xuhang Shi · Zhifang Mao · Sai Zhou · Shuaixian An · Xiuquan Hou</p>
 
 <p><strong>English</strong> | <a href="README.zh-CN.md">简体中文</a></p>
 
@@ -328,9 +327,14 @@ tests/          public contract and integration tests
 
 ## 📚 Citation and Contact
 
-EvLink is accepted to the EMNLP 2026 Main Conference. Citation metadata and the
-author list are provided in [CITATION.cff](CITATION.cff). The camera-ready paper
-link and final proceedings BibTeX will be added when the public bibliographic
-record is available.
+EvLink is accepted to the EMNLP 2026 Main Conference.
+
+**Authors:** Linyao Zheng, Xuhang Shi, Zhifang Mao, Sai Zhou, Shuaixian An, and
+Xiuquan Hou.
+
+Citation metadata is provided in [CITATION.cff](CITATION.cff). The camera-ready
+paper link and final proceedings BibTeX will be added when the public
+bibliographic record is available.
+
 Use [GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues) for bug
 reports, integration questions, and reproducibility problems.
