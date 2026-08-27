@@ -1,6 +1,6 @@
 """EvLink: source-grounded evidence links and coverage-aware selection."""
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from evidencelink.api import (
     PaperPipelineArtifacts,
