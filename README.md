@@ -322,3 +322,7 @@ bibliographic record is available.
 
 Use [GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues) for bug
 reports, integration questions, and reproducibility problems.
+
+---
+
+## 🚀 EvLink++ Coming Soon

@@ -315,3 +315,7 @@ Xiuquan Hou。
 
 遇到 bug、接入问题或复现问题，请在
 [GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues) 中反馈。
+
+---
+
+## 🚀 EvLink++ Coming Soon
