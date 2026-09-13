@@ -3,7 +3,6 @@
 # EvLink: Source-grounded Evidence Linking for Graph RAG
 
 <p>
-  <img alt="EMNLP 2026 Main Conference" src="https://img.shields.io/badge/EMNLP_2026-Main_Conference-B31B1B?style=flat-square">
   <a href="https://github.com/Xiao-AI-Lab/EvLink"><img alt="GitHub repository" src="https://img.shields.io/badge/GitHub-EvLink-181717?style=flat-square&logo=github&logoColor=white"></a>
   <a href="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml/badge.svg"></a>
   <a href="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml"><img alt="Package" src="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml/badge.svg"></a>
@@ -14,8 +13,6 @@
   <img alt="Graph RAG" src="https://img.shields.io/badge/Graph_RAG-source--grounded-0F766E?style=flat-square">
   <a href="reproduce/README.md"><img alt="Reproduction protocol" src="https://img.shields.io/badge/reproduction-protocol-7C3AED?style=flat-square"></a>
 </p>
-
-<p><strong>Accepted to EMNLP 2026 Main Conference</strong></p>
 
 <p><strong>English</strong> | <a href="README.zh-CN.md">简体中文</a></p>
 
@@ -311,14 +308,10 @@ tests/          public contract and integration tests
 
 ## 📚 Citation and Contact
 
-EvLink is accepted to the EMNLP 2026 Main Conference.
-
 **Authors:** Linyao Zheng, Xuhang Shi, Zhifang Mao, Sai Zhou, Shuaixian An, and
 Xiuquan Hou.
 
-Citation metadata is provided in [CITATION.cff](CITATION.cff). The camera-ready
-paper link and final proceedings BibTeX will be added when the public
-bibliographic record is available.
+Citation metadata for the software is provided in [CITATION.cff](CITATION.cff).
 
 Use [GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues) for bug
 reports, integration questions, and reproducibility problems.

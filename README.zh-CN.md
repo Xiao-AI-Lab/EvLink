@@ -3,7 +3,6 @@
 # EvLink: Source-grounded Evidence Linking for Graph RAG
 
 <p>
-  <img alt="EMNLP 2026 Main Conference" src="https://img.shields.io/badge/EMNLP_2026-Main_Conference-B31B1B?style=flat-square">
   <a href="https://github.com/Xiao-AI-Lab/EvLink"><img alt="GitHub 仓库" src="https://img.shields.io/badge/GitHub-EvLink-181717?style=flat-square&logo=github&logoColor=white"></a>
   <a href="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml"><img alt="测试" src="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/tests.yml/badge.svg"></a>
   <a href="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml"><img alt="打包" src="https://github.com/Xiao-AI-Lab/EvLink/actions/workflows/package.yml/badge.svg"></a>
@@ -14,8 +13,6 @@
   <img alt="Graph RAG" src="https://img.shields.io/badge/Graph_RAG-source--grounded-0F766E?style=flat-square">
   <a href="reproduce/README.md"><img alt="复现协议" src="https://img.shields.io/badge/reproduction-protocol-7C3AED?style=flat-square"></a>
 </p>
-
-<p><strong>已被 EMNLP 2026 Main Conference 接收</strong></p>
 
 <p><a href="README.md">English</a> | <strong>简体中文</strong></p>
 
@@ -305,13 +302,10 @@ tests/          公开接口与集成测试
 
 ## 📚 引用与联系
 
-EvLink 已被 EMNLP 2026 Main Conference 接收。
-
 **作者：** Linyao Zheng、Xuhang Shi、Zhifang Mao、Sai Zhou、Shuaixian An、
 Xiuquan Hou。
 
-机器可读的引用信息在 [CITATION.cff](CITATION.cff) 中。终稿论文链接和正式
-论文集 BibTeX 会在公开书目记录发布后补上。
+机器可读的软件引用信息在 [CITATION.cff](CITATION.cff) 中。
 
 遇到 bug、接入问题或复现问题，请在
 [GitHub Issues](https://github.com/Xiao-AI-Lab/EvLink/issues) 中反馈。

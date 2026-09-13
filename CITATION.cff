@@ -1,8 +1,6 @@
 cff-version: 1.2.0
 message: >-
-  EvLink was accepted to the EMNLP 2026 Main Conference. If you use EvLink,
-  please cite this software; the final proceedings citation will be added after
-  camera-ready publication.
+  If you use EvLink, please cite this software.
 title: "EvLink: Source-grounded Evidence Linking for Graph RAG"
 type: software
 authors:
@@ -46,5 +44,4 @@ keywords:
   - "Evidence Linking"
   - "Source-grounded Retrieval"
   - "Multi-hop Question Answering"
-  - "EMNLP 2026 Main Conference"
   - "Information Retrieval and Text Mining"
