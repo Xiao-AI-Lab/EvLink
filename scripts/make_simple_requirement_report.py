@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build naive requirement reports for EvLink ablations."""
+"""Build naive requirement reports for EvidenceLink ablations."""
 
 from __future__ import annotations
 

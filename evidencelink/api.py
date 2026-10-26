@@ -1,4 +1,4 @@
-"""Paper-facing API for the public EvLink package.
+"""Paper-facing API for the public EvidenceLink package.
 
 This module keeps the public method boundary aligned with the paper notation:
 
@@ -28,6 +28,7 @@ from evidencelink.contract import (
     PAPER_FACING_METHOD_NAME,
 )
 from evidencelink.evidence_needs import build_evidence_need_rows
+from evidencelink.embedding import DeterministicHashEmbeddingClient, OpenAIEmbeddingClient
 from evidencelink.index import build_evidence_link_index
 from evidencelink.induction import build_candidate_pool_records, write_candidate_pool
 from evidencelink.io_utils import write_json
@@ -37,7 +38,7 @@ from evidencelink.run_evidence_selection import run_evidence_selection
 
 @dataclass(frozen=True)
 class PaperPipelineArtifacts:
-    """Standard EvLink artifact paths for one paper-facing run."""
+    """Standard EvidenceLink artifact paths for one paper-facing run."""
 
     workdir: Path
     openie_facts: Path
@@ -66,7 +67,7 @@ class PaperPipelineArtifacts:
 
 @dataclass(frozen=True)
 class PaperPipelineConfig:
-    """Configuration for the paper-facing EvLink runner."""
+    """Configuration for the paper-facing EvidenceLink runner."""
 
     dataset: str = "custom"
     reader_budget_k: int = DEFAULT_READER_BUDGET_K
@@ -174,9 +175,25 @@ def build_candidate_pool_cq(
     dense_top_k: int = 20,
     max_hops: int = 2,
     pool_k: int = DEFAULT_POOL_K,
+    max_queries: int = 0,
+    embedding_name: str = "deterministic-hash",
+    embedding_base_url: str = "offline",
+    embedding_batch_size: int = 16,
+    embedding_api_key: str = "",
+    embedding_timeout: float = 120.0,
 ) -> list[Any]:
     """Build query-local candidate pools C_q and write them as JSONL."""
 
+    if str(embedding_name).lower() in {"deterministic-hash", "offline"}:
+        embedding_client = DeterministicHashEmbeddingClient()
+    else:
+        embedding_client = OpenAIEmbeddingClient(
+            base_url=embedding_base_url,
+            model=embedding_name,
+            batch_size=embedding_batch_size,
+            api_key=embedding_api_key,
+            timeout=embedding_timeout,
+        )
     records = build_candidate_pool_records(
         questions_path=questions_path,
         corpus_path=corpus_path,
@@ -184,6 +201,8 @@ def build_candidate_pool_cq(
         dense_top_k=dense_top_k,
         max_hops=max_hops,
         pool_k=pool_k,
+        max_queries=max_queries,
+        embedding_client=embedding_client,
     )
     write_candidate_pool(records, output_path)
     return records
@@ -199,6 +218,7 @@ def build_evidence_needs_bq(
     api_key: str = "",
     timeout: float = 120.0,
     max_steps: int = 5,
+    max_queries: int = 0,
 ) -> list[dict[str, object]]:
     """Build evidence-need sets B(q) and write them as JSONL."""
 
@@ -212,6 +232,12 @@ def build_evidence_needs_bq(
             api_key=api_key,
             timeout=timeout,
             max_steps=max_steps,
+            max_retries=8,
+            retry_delay_seconds=5.0,
+            request_delay_seconds=0.0,
+            resume=False,
+            incremental_write=False,
+            max_queries=max_queries,
         )
     )
     write_jsonl(rows, output_path)
@@ -245,6 +271,14 @@ def build_support_cache(
             api_key=api_key,
             timeout=timeout,
             fallback=fallback,
+            max_retries=5,
+            retry_delay_seconds=2.0,
+            request_delay_seconds=0.0,
+            query_start=0,
+            query_end=0,
+            resume=False,
+            incremental_write=False,
+            incremental_write_every=1,
         )
     )
 
@@ -319,7 +353,7 @@ def run_paper_pipeline(
     workdir: str | Path,
     config: PaperPipelineConfig | None = None,
 ) -> dict[str, Any]:
-    """Run the paper-facing EvLink pipeline end to end."""
+    """Run the paper-facing EvidenceLink pipeline end to end."""
 
     cfg = config or PaperPipelineConfig()
     artifacts = PaperPipelineArtifacts.from_workdir(workdir)
@@ -386,6 +420,12 @@ def run_paper_pipeline(
             dense_top_k=cfg.dense_top_k,
             max_hops=cfg.max_hops,
             pool_k=cfg.pool_k,
+            max_queries=cfg.max_queries,
+            embedding_name=cfg.embedding_name,
+            embedding_base_url=cfg.embedding_base_url,
+            embedding_batch_size=cfg.embedding_batch_size,
+            embedding_api_key=cfg.api_key,
+            embedding_timeout=cfg.timeout,
         )
         steps.append(_step_payload("build_candidate_pool_cq", artifacts.candidate_pool, "completed", count=len(records)))
 
@@ -401,6 +441,7 @@ def run_paper_pipeline(
             api_key=cfg.api_key,
             timeout=cfg.timeout,
             max_steps=cfg.max_steps,
+            max_queries=cfg.max_queries,
         )
         steps.append(_step_payload("build_evidence_needs_bq", artifacts.evidence_needs, "completed", count=len(rows)))
 

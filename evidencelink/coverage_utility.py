@@ -1,4 +1,4 @@
-"""Coverage utility provider for EvLink evidence selection."""
+"""Coverage utility provider for EvidenceLink evidence selection."""
 
 from __future__ import annotations
 
@@ -106,6 +106,7 @@ class CoverageUtilityProvider:
         binding_cache: Mapping[str, Sequence[str]],
         binding_model: str,
         binding_top_m: int = DEFAULT_BINDING_MAX_CANDIDATES,
+        binding_mode: str = "llm",
         min_objective_gain: float = DEFAULT_MIN_COVERAGE_GAIN,
         min_swap_gain: float = DEFAULT_MIN_SWAP_GAIN,
         llm_binding_title_match_mode: str = "wiki_title",
@@ -114,6 +115,7 @@ class CoverageUtilityProvider:
         self.binding_cache = dict(binding_cache)
         self.binding_model = str(binding_model)
         self.binding_top_m = int(binding_top_m)
+        self.binding_mode = str(binding_mode or "llm").strip().lower()
         self.min_objective_gain = float(min_objective_gain)
         self.min_swap_gain = float(min_swap_gain)
         self.llm_binding_title_match_mode = str(llm_binding_title_match_mode)
@@ -166,8 +168,8 @@ class CoverageUtilityProvider:
             safe_projection_mode="rank_cutoff",
             safe_retriever_margin_threshold=1.01,
             safe_retriever_rank_penalty=0.0,
-            llm_extract_fn=self._llm_extract_fn,
-            binding_mode="llm",
+            llm_extract_fn=self._llm_extract_fn if self.binding_mode == "llm" else None,
+            binding_mode=self.binding_mode,
             llm_binding_title_match_mode=self.llm_binding_title_match_mode,
             evidence_link_metadata=dict(state.pool_trace or {}),
             selection_label_override="coverage_aware_evidence_selection",
@@ -180,6 +182,7 @@ class CoverageUtilityProvider:
             "binding_model": self.binding_model,
             "binding_cache_entry_count": int(len(self.binding_cache)),
             "binding_top_m": int(self.binding_top_m),
+            "binding_mode": self.binding_mode,
             "min_objective_gain": float(self.min_objective_gain),
             "min_swap_gain": float(self.min_swap_gain),
             "llm_binding_title_match_mode": self.llm_binding_title_match_mode,

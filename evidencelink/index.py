@@ -19,6 +19,11 @@ def normalize_endpoint(value: Any) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+MAX_ENDPOINT_ALIGNED_DOC_COUNT = 50
+
+_LINK_TYPE_TRAVERSAL_PRIORITY = {"relation_grounded": 0, "endpoint_aligned": 1}
+
+
 @dataclass(frozen=True)
 class EvidenceLink:
     source_doc_id: str
@@ -38,13 +43,35 @@ class EvidenceLink:
 class EvidenceLinkIndex:
     documents: dict[str, Document] = field(default_factory=dict)
     links: list[EvidenceLink] = field(default_factory=list)
+    _neighbors_by_source: dict[str, list[EvidenceLink]] = field(default_factory=dict, init=False, repr=False)
+    _witnesses_by_edge: dict[tuple[str, str], list[dict[str, Any]]] = field(default_factory=dict, init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        neighbors: dict[str, list[EvidenceLink]] = defaultdict(list)
+        witnesses: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+        for link in self.links:
+            neighbors[link.source_doc_id].append(link)
+            witnesses[(link.source_doc_id, link.target_doc_id)].extend(dict(item) for item in link.witnesses)
+        for doc_links in neighbors.values():
+            doc_links.sort(key=lambda link: _LINK_TYPE_TRAVERSAL_PRIORITY.get(link.link_type, 99))
+        self._neighbors_by_source = dict(neighbors)
+        self._witnesses_by_edge = dict(witnesses)
 
     @classmethod
     def build(cls, documents: Sequence[Document], facts: Sequence[OpenIEFact]) -> "EvidenceLinkIndex":
         docs = {str(doc.doc_id): doc for doc in documents}
         title_to_doc_ids: dict[str, list[str]] = defaultdict(list)
+        scope_by_doc_id = {
+            str(doc.doc_id): str((doc.metadata or {}).get("scope_id") or "").strip()
+            for doc in documents
+        }
         for doc in documents:
             title_to_doc_ids[normalize_endpoint(doc.title)].append(str(doc.doc_id))
+
+        def compatible_scopes(source_doc_id: str, target_doc_id: str) -> bool:
+            source_scope = scope_by_doc_id.get(str(source_doc_id), "")
+            target_scope = scope_by_doc_id.get(str(target_doc_id), "")
+            return not source_scope or not target_scope or source_scope == target_scope
 
         links_by_key: dict[tuple[str, str, str, str], list[dict[str, Any]]] = defaultdict(list)
         doc_endpoints: dict[str, set[str]] = defaultdict(set)
@@ -58,18 +85,22 @@ class EvidenceLinkIndex:
             witness = fact.to_mapping()
             for endpoint in endpoints:
                 for target_doc_id in title_to_doc_ids.get(endpoint, []):
-                    if target_doc_id == fact.doc_id:
+                    if target_doc_id == fact.doc_id or not compatible_scopes(fact.doc_id, target_doc_id):
                         continue
                     key = (fact.doc_id, target_doc_id, "relation_grounded", endpoint)
                     links_by_key[key].append(witness)
 
-        doc_ids = list(docs)
-        for src in doc_ids:
-            for dst in doc_ids:
-                if src == dst:
-                    continue
-                shared = sorted(doc_endpoints[src].intersection(doc_endpoints[dst]))
-                for endpoint in shared:
+        endpoint_to_doc_ids: dict[str, list[str]] = defaultdict(list)
+        for doc_id, endpoints in doc_endpoints.items():
+            for endpoint in endpoints:
+                endpoint_to_doc_ids[endpoint].append(doc_id)
+        for endpoint, endpoint_doc_ids in endpoint_to_doc_ids.items():
+            if len(endpoint_doc_ids) > MAX_ENDPOINT_ALIGNED_DOC_COUNT:
+                continue
+            for src in endpoint_doc_ids:
+                for dst in endpoint_doc_ids:
+                    if src == dst or not compatible_scopes(src, dst):
+                        continue
                     key = (src, dst, "endpoint_aligned", endpoint)
                     links_by_key[key].append({"endpoint": endpoint, "source": "endpoint_alignment"})
 
@@ -125,15 +156,12 @@ class EvidenceLinkIndex:
         output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     def neighbors(self, doc_id: str) -> list[EvidenceLink]:
-        key = str(doc_id)
-        return [link for link in self.links if link.source_doc_id == key]
+        return list(self._neighbors_by_source.get(str(doc_id), ()))
 
     def edge_witnesses(self, source_doc_id: str, target_doc_id: str) -> list[dict[str, Any]]:
         return [
             dict(witness)
-            for link in self.links
-            if link.source_doc_id == str(source_doc_id) and link.target_doc_id == str(target_doc_id)
-            for witness in link.witnesses
+            for witness in self._witnesses_by_edge.get((str(source_doc_id), str(target_doc_id)), ())
         ]
 
 
@@ -151,7 +179,7 @@ def build_evidence_link_index(
 def build_arg_parser():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Build a source-grounded EvLink index from corpus and OpenIE facts.")
+    parser = argparse.ArgumentParser(description="Build a source-grounded EvidenceLink index from corpus and OpenIE facts.")
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--openie", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a lightweight OpenAI-compatible reader over EvLink top-5 reports."""
+"""Run a lightweight OpenAI-compatible reader over EvidenceLink top-5 reports."""
 
 from __future__ import annotations
 
@@ -13,6 +13,23 @@ from statistics import mean
 from typing import Any, Mapping, Sequence
 
 from evidencelink.utils.text import normalize_answer
+
+
+def qwen_no_think_enabled(model: str) -> bool:
+    flag = str(os.environ.get("YUNWU_QWEN_NO_THINK", "")).strip().lower()
+    return "qwen" in str(model).lower() and flag in {"1", "true", "yes", "y", "on"}
+
+
+def with_qwen_no_think_messages(messages: Sequence[Mapping[str, str]], *, model: str) -> list[dict[str, str]]:
+    prefix = str(os.environ.get("YUNWU_QWEN_NO_THINK_PREFIX", "/no_think") or "/no_think")
+    output: list[dict[str, str]] = []
+    for message in messages:
+        item = dict(message)
+        content = str(item.get("content") or "")
+        if str(item.get("role", "")).lower() == "user" and qwen_no_think_enabled(model) and prefix not in content[:128]:
+            item["content"] = f"{prefix}\n{content}"
+        output.append(item)
+    return output
 
 
 def read_json(path: str | Path) -> Any:
@@ -51,7 +68,7 @@ def token_f1(prediction: str, gold_answers: Sequence[str]) -> float:
     return best
 
 
-def build_prompt(question: str, passages: Sequence[str]) -> list[dict[str, str]]:
+def build_prompt(question: str, passages: Sequence[str], *, dataset: str = "") -> list[dict[str, str]]:
     context = []
     for idx, passage in enumerate(passages, start=1):
         context.append(f"[{idx}] {str(passage).strip()}")
@@ -68,7 +85,14 @@ def build_prompt(question: str, passages: Sequence[str]) -> list[dict[str, str]]
 
 
 def chat_completion(*, base_url: str, model: str, api_key: str, messages: Sequence[Mapping[str, str]], timeout: float) -> str:
-    payload = json.dumps({"model": model, "messages": list(messages), "temperature": 0}).encode("utf-8")
+    payload_obj: dict[str, object] = {
+        "model": model,
+        "messages": with_qwen_no_think_messages(messages, model=model),
+        "temperature": 0,
+    }
+    if qwen_no_think_enabled(model):
+        payload_obj["enable_thinking"] = False
+    payload = json.dumps(payload_obj).encode("utf-8")
     request = urllib.request.Request(
         str(base_url).rstrip("/") + "/chat/completions",
         data=payload,
@@ -90,6 +114,7 @@ def extract_answer(response: str) -> str:
 
 def run_reader(args: argparse.Namespace) -> dict[str, Any]:
     payload = read_json(args.retrieval_report)
+    dataset = str(payload.get("dataset") or "")
     rows = list(payload.get("rows") or [])
     if int(args.max_queries) > 0:
         rows = rows[: int(args.max_queries)]
@@ -102,7 +127,7 @@ def run_reader(args: argparse.Namespace) -> dict[str, Any]:
             base_url=str(args.llm_base_url),
             model=str(args.llm_name),
             api_key=str(args.api_key or os.environ.get("OPENAI_API_KEY", "")),
-            messages=build_prompt(str(row.get("question") or ""), passages),
+            messages=build_prompt(str(row.get("question") or ""), passages, dataset=dataset),
             timeout=float(args.timeout),
         )
         answer = extract_answer(response)
@@ -110,6 +135,7 @@ def run_reader(args: argparse.Namespace) -> dict[str, Any]:
         outputs.append(
             {
                 "query_index": int(row.get("query_index", idx)),
+                "query_id": str(row.get("query_id") or row.get("query_index", idx)),
                 "question": str(row.get("question") or ""),
                 "gold_answers": gold_answers,
                 "prediction": answer,
@@ -120,7 +146,7 @@ def run_reader(args: argparse.Namespace) -> dict[str, Any]:
         )
     return {
         "method": str(payload.get("method") or "evidencelink"),
-        "dataset": str(payload.get("dataset") or ""),
+        "dataset": dataset,
         "reader": {"llm_name": str(args.llm_name), "qa_top_k": int(args.qa_top_k)},
         "summary": {
             "count": len(outputs),

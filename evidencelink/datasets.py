@@ -1,4 +1,4 @@
-"""Benchmark dataset registry for EvLink reproductions."""
+"""Benchmark dataset registry for EvidenceLink reproductions."""
 
 from __future__ import annotations
 
@@ -111,7 +111,7 @@ _SPECS_BY_NAME = {spec.name: spec for spec in SUPPORTED_DATASETS}
 
 
 def canonical_dataset_name(name: str) -> str:
-    """Return the local canonical dataset name used by EvLink."""
+    """Return the local canonical dataset name used by EvidenceLink."""
 
     raw = str(name).strip().lower()
     return DATASET_ALIASES.get(raw, raw)

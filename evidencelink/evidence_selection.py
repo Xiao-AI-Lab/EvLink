@@ -1,4 +1,4 @@
-"""Coverage-aware evidence selection over an exported EvLink candidate pool."""
+"""Coverage-aware evidence selection over an exported EvidenceLink candidate pool."""
 
 from __future__ import annotations
 
@@ -50,9 +50,7 @@ def compose_evidence_selection(
 ) -> EvidenceSelectionResult:
     validate_budgets(reader_budget_k=state.reader_budget_k, stability_window_m=state.stability_window_m)
     baseline_positions = list(range(min(int(state.reader_budget_k), len(state.pool_docs))))
-    protected_baseline_positions = list(
-        range(min(int(state.stability_window_m), len(baseline_positions)))
-    )
+    stable_seed_positions = list(range(min(int(state.stability_window_m), len(baseline_positions))))
     selected_positions, selection_trace = utility_provider.select_positions(state, requirements)
     final_positions = finalized_positions(
         selected_positions,
@@ -66,11 +64,10 @@ def compose_evidence_selection(
     if not isinstance(safe_trace, Mapping):
         safe_trace = {}
     decision = "admit" if admitted_positions or final_positions != baseline_positions else "keep_baseline"
-    rank_stability_held = (
-        final_positions[: len(protected_baseline_positions)] == protected_baseline_positions
-    )
+    rank_stability_held = final_positions[: len(stable_seed_positions)] == stable_seed_positions
     final_titles = [state.pool_titles[pos] for pos in final_positions if pos < len(state.pool_titles)]
     final_docs = [state.pool_docs[pos] for pos in final_positions if pos < len(state.pool_docs)]
+    effective_binding_mode = str(selection_trace.get("effective_binding_mode") or "")
     trace = {
         "method": METHOD_NAME,
         "paper_facing_method": PAPER_FACING_METHOD_NAME,
@@ -82,17 +79,13 @@ def compose_evidence_selection(
         "admission_window": int(admission_window(state.reader_budget_k, state.stability_window_m)),
         "baseline_positions": list(baseline_positions),
         "baseline_titles": [state.pool_titles[pos] for pos in baseline_positions if pos < len(state.pool_titles)],
-        "stable_seed_positions": list(protected_baseline_positions),
+        "stable_seed_positions": list(stable_seed_positions),
         "stable_seed_titles": [
-            state.pool_titles[pos]
-            for pos in protected_baseline_positions
-            if pos < len(state.pool_titles)
+            state.pool_titles[pos] for pos in stable_seed_positions if pos < len(state.pool_titles)
         ],
-        "protected_baseline_positions": list(protected_baseline_positions),
+        "protected_baseline_positions": list(stable_seed_positions),
         "protected_baseline_titles": [
-            state.pool_titles[pos]
-            for pos in protected_baseline_positions
-            if pos < len(state.pool_titles)
+            state.pool_titles[pos] for pos in stable_seed_positions if pos < len(state.pool_titles)
         ],
         "baseline_objective": selection_trace.get("baseline_objective", safe_trace.get("baseline_objective")),
         "best_candidate_position": first_step.get("in_position") if first_step else None,
@@ -105,7 +98,11 @@ def compose_evidence_selection(
         "final_titles": list(final_titles),
         "admitted_positions": list(admitted_positions),
         "ordering_policy": DEFAULT_ORDERING_POLICY,
-        "evidence_need_binding": "frozen_cache_binding_candidates",
+        "evidence_need_binding": (
+            "disabled_raw_requirement_support"
+            if effective_binding_mode == "nobind"
+            else "frozen_cache_binding_candidates"
+        ),
         "selected_binding_id": selection_trace.get("selected_binding_id"),
         "safe_decision": safe_trace.get("safe_decision"),
         "admission_steps": list(steps),
@@ -123,7 +120,7 @@ def compose_evidence_selection(
         final_docs=tuple(final_docs),
         final_titles=tuple(final_titles),
         baseline_positions=tuple(baseline_positions),
-        stable_seed_positions=tuple(protected_baseline_positions),
+        stable_seed_positions=tuple(stable_seed_positions),
         admitted_positions=tuple(admitted_positions),
         trace=trace,
         raw_selection_trace=dict(selection_trace),

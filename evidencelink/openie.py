@@ -1,4 +1,4 @@
-"""OpenIE fact extraction entrypoint for EvLink."""
+"""OpenIE fact extraction entrypoint for EvidenceLink."""
 
 from __future__ import annotations
 
@@ -11,6 +11,23 @@ from typing import Any, Mapping, Sequence
 import urllib.request
 
 from evidencelink.artifacts import OpenIEFact, load_documents, write_jsonl
+
+
+def qwen_no_think_enabled(model: str) -> bool:
+    flag = str(os.environ.get("YUNWU_QWEN_NO_THINK", "")).strip().lower()
+    return "qwen" in str(model).lower() and flag in {"1", "true", "yes", "y", "on"}
+
+
+def with_qwen_no_think_messages(messages: Sequence[Mapping[str, str]], *, model: str) -> list[dict[str, str]]:
+    prefix = str(os.environ.get("YUNWU_QWEN_NO_THINK_PREFIX", "/no_think") or "/no_think")
+    output: list[dict[str, str]] = []
+    for message in messages:
+        item = dict(message)
+        content = str(item.get("content") or "")
+        if str(item.get("role", "")).lower() == "user" and qwen_no_think_enabled(model) and prefix not in content[:128]:
+            item["content"] = f"{prefix}\n{content}"
+        output.append(item)
+    return output
 
 
 def simple_sentence_facts(doc_id: str, text: str) -> list[OpenIEFact]:
@@ -42,7 +59,14 @@ def simple_sentence_facts(doc_id: str, text: str) -> list[OpenIEFact]:
 
 
 def chat_completion(*, base_url: str, model: str, api_key: str, messages: Sequence[Mapping[str, str]], timeout: float) -> str:
-    payload = json.dumps({"model": model, "messages": list(messages), "temperature": 0}).encode("utf-8")
+    payload_obj: dict[str, object] = {
+        "model": model,
+        "messages": with_qwen_no_think_messages(messages, model=model),
+        "temperature": 0,
+    }
+    if qwen_no_think_enabled(model):
+        payload_obj["enable_thinking"] = False
+    payload = json.dumps(payload_obj).encode("utf-8")
     request = urllib.request.Request(
         base_url.rstrip("/") + "/chat/completions" if not base_url.rstrip("/").endswith("/chat/completions") else base_url,
         data=payload,
@@ -120,7 +144,7 @@ def build_openie_facts(args: argparse.Namespace) -> list[OpenIEFact]:
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Build OpenIE fact artifacts for EvLink.")
+    parser = argparse.ArgumentParser(description="Build OpenIE fact artifacts for EvidenceLink.")
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--mode", choices=("simple", "llm"), default="simple")

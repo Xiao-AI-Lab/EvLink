@@ -1,4 +1,4 @@
-"""Dense and anchor seeding for EvLink candidate-pool construction."""
+"""Dense and anchor seeding for EvidenceLink candidate-pool construction."""
 
 from __future__ import annotations
 
@@ -22,19 +22,21 @@ def cosine(a: np.ndarray, b: np.ndarray) -> float:
 
 
 def anchor_seed_doc_ids(documents: Sequence[Document], anchors: Sequence[str], *, limit: int = 20) -> list[str]:
-    seeds: list[str] = []
-    seen: set[str] = set()
-    normalized_anchors = [normalize_endpoint(anchor) for anchor in anchors if normalize_endpoint(anchor)]
+    patterns = [
+        re.compile(r"\b%s\b" % re.escape(anchor))
+        for anchor in (normalize_endpoint(a) for a in anchors)
+        if anchor
+    ]
+    scored: list[tuple[str, int, int]] = []
     for doc in documents:
-        haystack = normalize_endpoint(f"{doc.title} {doc.text}")
         title = normalize_endpoint(doc.title)
-        if any(anchor in title or anchor in haystack for anchor in normalized_anchors):
-            if doc.doc_id not in seen:
-                seen.add(doc.doc_id)
-                seeds.append(doc.doc_id)
-        if len(seeds) >= int(limit):
-            break
-    return seeds
+        haystack = normalize_endpoint(f"{doc.title} {doc.text}")
+        title_hits = sum(1 for pattern in patterns if pattern.search(title))
+        text_hits = sum(1 for pattern in patterns if pattern.search(haystack))
+        if title_hits or text_hits:
+            scored.append((doc.doc_id, title_hits, text_hits))
+    scored.sort(key=lambda item: (-item[1], -item[2]))
+    return [doc_id for doc_id, _, _ in scored[: int(limit)]]
 
 
 def dense_seed_doc_ids(
@@ -51,7 +53,6 @@ def dense_seed_doc_ids(
     scored: list[tuple[str, float]] = []
     for doc in documents:
         doc_vec = np.asarray(embeddings.get(doc.passage, np.array([])), dtype=float)
-        lexical_bonus = 0.05 * len(set(re.findall(r"\w+", question.lower())).intersection(re.findall(r"\w+", doc.passage.lower())))
-        scored.append((doc.doc_id, cosine(query_vec, doc_vec) + lexical_bonus))
+        scored.append((doc.doc_id, cosine(query_vec, doc_vec)))
     scored.sort(key=lambda item: (-item[1], item[0]))
     return scored[: int(top_k)]

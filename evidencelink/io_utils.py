@@ -1,4 +1,4 @@
-"""I/O and metric helpers for the coverage-aware evidence selection component used by EvLink."""
+"""I/O and metric helpers for the coverage-aware evidence selection component used by EvidenceLink."""
 
 from __future__ import annotations
 
@@ -62,6 +62,27 @@ def title_all_covered(gold_titles: Sequence[Any], candidate_titles: Sequence[Any
         return False
     have = title_counter(candidate_titles, k=k)
     return all(have[title] >= count for title, count in gold.items())
+
+
+def doc_recall(gold_doc_ids: Sequence[Any], candidate_doc_ids: Sequence[Any], *, k: int) -> float:
+    """Compute exact document-id recall for datasets with passage annotations."""
+
+    gold = Counter(str(item) for item in gold_doc_ids if str(item))
+    if not gold:
+        return 0.0
+    have = Counter(str(item) for item in list(candidate_doc_ids)[: int(k)] if str(item))
+    hit = sum(min(count, have[doc_id]) for doc_id, count in gold.items())
+    return hit / sum(gold.values())
+
+
+def doc_all_covered(gold_doc_ids: Sequence[Any], candidate_doc_ids: Sequence[Any], *, k: int) -> bool:
+    """Return whether all exact gold document ids occur in the top-k candidates."""
+
+    gold = Counter(str(item) for item in gold_doc_ids if str(item))
+    if not gold:
+        return False
+    have = Counter(str(item) for item in list(candidate_doc_ids)[: int(k)] if str(item))
+    return all(have[doc_id] >= count for doc_id, count in gold.items())
 
 
 def safe_float(value: Any, default: float = 0.0) -> float:
@@ -142,12 +163,6 @@ def evidence_selection_trace(
     safe_trace = safe_projection_trace(selection_trace)
     baseline_titles = baseline_titles_from_trace(trace)[:reader_budget_k]
     final_titles = final_titles_from_trace(trace)[:reader_budget_k]
-    protected_baseline_positions = list(
-        range(min(int(stability_window_m), len(baseline_titles)))
-    )
-    protected_baseline_titles = [
-        baseline_titles[pos] for pos in protected_baseline_positions
-    ]
     steps = swap_steps(selection_trace)
     first_step = steps[0] if steps else {}
     decision = "admit" if steps and baseline_titles != final_titles else "keep_baseline"
@@ -164,10 +179,7 @@ def evidence_selection_trace(
         "retention_proxy": DEFAULT_RETENTION_PROXY,
         "admission_objective": DEFAULT_ADMISSION_OBJECTIVE,
         "baseline_top5_titles": baseline_titles,
-        "stable_seed_positions": list(protected_baseline_positions),
-        "stable_seed_titles": list(protected_baseline_titles),
-        "protected_baseline_positions": list(protected_baseline_positions),
-        "protected_baseline_titles": list(protected_baseline_titles),
+        "stable_seed_titles": baseline_titles[:stability_window_m],
         "admission_boundary_title": admission_boundary_title,
         "baseline_objective": safe_float(
             selection_trace.get("baseline_objective", safe_trace.get("baseline_objective")),

@@ -80,6 +80,9 @@ class FrozenReportRequirementProvider:
         key = str(state.question or "").strip()
         if key in self.requirements_by_question:
             return list(self.requirements_by_question[key])
+        query_id = str(state.query_id or "").strip()
+        if query_id in self.requirements_by_question:
+            return list(self.requirements_by_question[query_id])
         query_key = str(state.query_idx)
         if query_key in self.requirements_by_question:
             return list(self.requirements_by_question[query_key])

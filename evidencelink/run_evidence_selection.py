@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run EvLink coverage-aware evidence selection over an exported pool.
+"""Run EvidenceLink coverage-aware evidence selection over an exported pool.
 
 The runner expects an exported candidate pool, a frozen evidence-need report,
 and a frozen binding cache.
@@ -44,6 +44,8 @@ from evidencelink.coverage_utility import (  # noqa: E402
 from evidencelink.artifacts import read_json_or_jsonl  # noqa: E402
 from evidencelink.evidence_selection import compose_evidence_selection  # noqa: E402
 from evidencelink.io_utils import (  # noqa: E402
+    doc_all_covered,
+    doc_recall,
     title_all_covered,
     title_recall,
     write_json,
@@ -111,15 +113,29 @@ def build_query_trace(
     state: EvidenceQueryState,
     result: Any,
 ) -> dict[str, Any]:
+    reader_doc_ids_source = list(
+        (state.pool_trace or {}).get("reader_pool_doc_ids")
+        or (state.pool_trace or {}).get("external_pool_doc_ids")
+        or state.pool_doc_ids
+    )
     baseline_titles = list(state.pool_titles[: int(state.reader_budget_k)])
+    baseline_doc_ids = reader_doc_ids_source[: int(state.reader_budget_k)]
     final_titles = list(result.final_titles)
+    final_doc_ids = [
+        reader_doc_ids_source[pos]
+        for pos in result.final_positions
+        if pos < len(reader_doc_ids_source) and reader_doc_ids_source[pos] is not None
+    ]
     return {
-        "query_id": state.query_id,
         "query_index": int(state.query_idx),
+        "query_id": str(state.query_id),
         "question": state.question,
         "gold_answers": list(state.gold_answers),
+        "gold_doc_ids": list(state.gold_doc_ids),
         "gold_titles": list(state.gold_titles),
+        "baseline_top_doc_ids": baseline_doc_ids,
         "baseline_top_titles": baseline_titles,
+        "selected_top_doc_ids": final_doc_ids,
         "selected_top_titles": final_titles,
         "changed_from_baseline": bool(baseline_titles != final_titles),
         "selection_trace": dict(result.raw_selection_trace),
@@ -147,19 +163,34 @@ def build_report_row(
         if pos < len(reader_doc_ids_source) and reader_doc_ids_source[pos] is not None
     ]
     baseline_titles = list(state.pool_titles[: int(state.reader_budget_k)])
+    baseline_doc_ids = reader_doc_ids_source[: int(state.reader_budget_k)]
     final_titles = list(result.final_titles)
+    gold_doc_ids = list(state.gold_doc_ids) or list(source_row.get("gold_doc_indices") or [])
     return {
-        "query_id": state.query_id,
         "query_index": int(state.query_idx),
+        "query_id": str(state.query_id),
         "question": state.question,
         "gold_answers": list(state.gold_answers),
+        "gold_doc_indices": gold_doc_ids,
         "gold_docs": list(state.gold_docs),
         "gold_titles": list(state.gold_titles),
-        "gold_doc_indices": list(source_row.get("gold_doc_indices") or []),
         "retrieved_doc_indices_top5": final_doc_ids,
         "retrieved_docs_top5": list(getattr(result, "final_docs", ())),
         "retrieved_titles_top5": final_titles,
+        "baseline_doc_indices_top5": baseline_doc_ids,
         "baseline_titles_top5": baseline_titles,
+        "baseline_doc_recall_at5": doc_recall(gold_doc_ids, baseline_doc_ids, k=int(state.reader_budget_k)),
+        "baseline_doc_all_gold_at5": doc_all_covered(
+            gold_doc_ids, baseline_doc_ids, k=int(state.reader_budget_k)
+        ),
+        "baseline_title_recall_at5": title_recall(
+            list(state.gold_titles), baseline_titles, k=int(state.reader_budget_k)
+        ),
+        "baseline_title_all_gold_at5": title_all_covered(
+            list(state.gold_titles), baseline_titles, k=int(state.reader_budget_k)
+        ),
+        "doc_recall_at5": doc_recall(gold_doc_ids, final_doc_ids, k=int(state.reader_budget_k)),
+        "doc_all_gold_at5": doc_all_covered(gold_doc_ids, final_doc_ids, k=int(state.reader_budget_k)),
         "title_recall_at5": title_recall(list(state.gold_titles), final_titles, k=int(state.reader_budget_k)),
         "title_all_gold_at5": title_all_covered(list(state.gold_titles), final_titles, k=int(state.reader_budget_k)),
         "evidence_need_count": int(requirement_count),
@@ -175,6 +206,22 @@ def summarize_rows(rows: Sequence[Mapping[str, Any]], traces: Sequence[Mapping[s
     return {
         "count": int(count),
         "changed_count": int(sum(bool(trace.get("changed_from_baseline")) for trace in traces)),
+        "baseline_doc_recall_top5": round(
+            mean(float(row.get("baseline_doc_recall_at5", 0.0)) for row in rows), 4
+        ),
+        "baseline_doc_all_gold_top5": round(
+            sum(bool(row.get("baseline_doc_all_gold_at5")) for row in rows) / count, 4
+        ),
+        "doc_recall_top5": round(mean(float(row.get("doc_recall_at5", 0.0)) for row in rows), 4),
+        "evidence_selection_doc_all_gold_top5": round(
+            sum(bool(row.get("doc_all_gold_at5")) for row in rows) / count, 4
+        ),
+        "baseline_title_recall_top5": round(
+            mean(float(row.get("baseline_title_recall_at5", 0.0)) for row in rows), 4
+        ),
+        "baseline_title_all_gold_top5": round(
+            sum(bool(row.get("baseline_title_all_gold_at5")) for row in rows) / count, 4
+        ),
         "title_recall_top5": round(mean(float(row.get("title_recall_at5", 0.0)) for row in rows), 4),
         "evidence_selection_title_all_gold_top5": round(
             sum(bool(row.get("title_all_gold_at5")) for row in rows) / count, 4
@@ -188,7 +235,11 @@ def summarize_rows(rows: Sequence[Mapping[str, Any]], traces: Sequence[Mapping[s
     }
 
 
-def run_evidence_selection(args: argparse.Namespace) -> dict[str, Any]:
+def run_evidence_selection(
+    args: argparse.Namespace,
+    *,
+    embedding_client: Any | None = None,
+) -> dict[str, Any]:
     pool_payload = load_pool_payload(args.pool_json)
     records = list(pool_payload.get("records") or [])
     if int(args.max_queries) > 0:
@@ -196,16 +247,17 @@ def run_evidence_selection(args: argparse.Namespace) -> dict[str, Any]:
 
     source_payload = source_retrieval_payload(pool_payload)
     source_rows = row_by_query_index(source_payload)
-    if str(args.embedding_name).lower() in {"deterministic-hash", "offline"}:
-        embedding_client = DeterministicHashEmbeddingClient()
-    else:
-        embedding_client = OpenAIEmbeddingClient(
-            base_url=str(args.embedding_base_url),
-            model=str(args.embedding_name),
-            batch_size=int(args.embedding_batch_size),
-            api_key=str(args.embedding_api_key or os.environ.get("OPENAI_API_KEY", "")),
-            timeout=float(args.embedding_timeout),
-        )
+    if embedding_client is None:
+        if str(args.embedding_name).lower() in {"deterministic-hash", "offline"}:
+            embedding_client = DeterministicHashEmbeddingClient()
+        else:
+            embedding_client = OpenAIEmbeddingClient(
+                base_url=str(args.embedding_base_url),
+                model=str(args.embedding_name),
+                batch_size=int(args.embedding_batch_size),
+                api_key=str(args.embedding_api_key or os.environ.get("OPENAI_API_KEY", "")),
+                timeout=float(args.embedding_timeout),
+            )
 
     requirement_provider = FrozenReportRequirementProvider(
         args.requirement_report,
@@ -216,6 +268,7 @@ def run_evidence_selection(args: argparse.Namespace) -> dict[str, Any]:
         binding_cache=load_binding_cache(args.binding_cache_path),
         binding_model=str(args.llm_binding_model or "qwen3-32b-judge"),
         binding_top_m=int(args.binding_max_candidates),
+        binding_mode=str(getattr(args, "binding_mode", "llm")),
         min_objective_gain=float(args.min_coverage_gain),
         min_swap_gain=float(args.min_swap_gain),
         llm_binding_title_match_mode=str(args.llm_binding_title_match_mode),
@@ -279,6 +332,7 @@ def run_evidence_selection(args: argparse.Namespace) -> dict[str, Any]:
             "reader_budget_k": int(args.reader_budget_k),
             "stability_window_m": int(args.stability_window_m),
             "pool_k": int(args.pool_k),
+            "binding_mode": str(getattr(args, "binding_mode", "llm")),
             "min_coverage_gain": float(args.min_coverage_gain),
             "min_swap_gain": float(args.min_swap_gain),
         },
@@ -313,6 +367,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--embedding-api-key", default="")
     parser.add_argument("--embedding-timeout", type=float, default=120.0)
     parser.add_argument("--binding-max-candidates", type=int, default=DEFAULT_BINDING_MAX_CANDIDATES)
+    parser.add_argument("--binding-mode", choices=("llm", "nobind", "string_match"), default="llm")
     parser.add_argument("--llm-binding-title-match-mode", default="wiki_title")
     parser.add_argument("--min-coverage-gain", type=float, default=DEFAULT_MIN_COVERAGE_GAIN)
     parser.add_argument("--min-swap-gain", type=float, default=DEFAULT_MIN_SWAP_GAIN)

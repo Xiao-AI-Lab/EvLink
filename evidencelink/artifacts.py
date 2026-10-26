@@ -1,4 +1,4 @@
-"""Artifact schemas and JSON helpers for the public EvLink pipeline."""
+"""Artifact schemas and JSON helpers for the public EvidenceLink pipeline."""
 
 from __future__ import annotations
 
@@ -6,8 +6,6 @@ from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
-
-from evidencelink.contract import MAIN_UPSTREAM_RETRIEVER_NAME
 
 
 @dataclass(frozen=True)
@@ -140,11 +138,14 @@ class CandidatePoolRecord:
     gold_titles: tuple[str, ...] = ()
     gold_answers: tuple[str, ...] = ()
     local_subgraph: Mapping[str, Any] = field(default_factory=dict)
+    query_index: int = 0
+    metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def to_mapping(self) -> dict[str, Any]:
         return {
             "query_id": self.query_id,
             "query_idx": self.query_id,
+            "query_index": int(self.query_index),
             "question": self.question,
             "anchors": list(self.anchors),
             "seed_doc_ids": list(self.seed_doc_ids),
@@ -153,16 +154,17 @@ class CandidatePoolRecord:
             "gold_docs": list(self.gold_doc_ids),
             "gold_titles": list(self.gold_titles),
             "gold_answers": list(self.gold_answers),
+            "metadata": dict(self.metadata),
             "local_subgraph": dict(self.local_subgraph),
             "pool_docs": [f"{item.title}\n{item.text}".strip() for item in self.candidate_pool],
             "pool_titles": [item.title for item in self.candidate_pool],
             "pool_doc_ids": [item.doc_id for item in self.candidate_pool],
             "pool_doc_scores": [item.score for item in self.candidate_pool],
             "pool_trace": {
-                "input_method": MAIN_UPSTREAM_RETRIEVER_NAME,
                 "anchors": list(self.anchors),
                 "seed_doc_ids": list(self.seed_doc_ids),
                 "local_subgraph": dict(self.local_subgraph),
+                "metadata": dict(self.metadata),
             },
         }
 

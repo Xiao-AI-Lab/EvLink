@@ -15,6 +15,7 @@ class EvidenceQueryState:
     question: str
     query_id: str = ""
     gold_answers: tuple[str, ...] = ()
+    gold_doc_ids: tuple[Any, ...] = ()
     gold_docs: tuple[str, ...] = ()
     gold_titles: tuple[str, ...] = ()
     pool_docs: tuple[str, ...] = ()
@@ -54,11 +55,7 @@ class EvidenceQueryState:
                 doc_ids.append(int(value) if value is not None and str(value).isdigit() else value)
             except (TypeError, ValueError):
                 doc_ids.append(value)
-        raw_query_id = record.get("query_id", record.get("query_idx", record.get("query_index", 0)))
-        query_id = str(raw_query_id if raw_query_id is not None else "")
-        raw_query_idx = record.get("query_index")
-        if raw_query_idx is None:
-            raw_query_idx = record.get("query_idx", 0)
+        raw_query_idx = record.get("query_index", record.get("query_idx", 0)) or 0
         try:
             query_idx = int(raw_query_idx)
         except (TypeError, ValueError):
@@ -66,9 +63,14 @@ class EvidenceQueryState:
         return cls(
             dataset=str(dataset),
             query_idx=query_idx,
+            query_id=str(record.get("query_id") or raw_query_idx),
             question=str(record.get("question") or ""),
-            query_id=query_id,
             gold_answers=tuple(str(item) for item in list(record.get("gold_answers") or [])),
+            gold_doc_ids=tuple(
+                record.get("gold_doc_indices")
+                or record.get("gold_doc_ids")
+                or []
+            ),
             gold_docs=tuple(str(item) for item in list(record.get("gold_docs") or [])),
             gold_titles=tuple(str(item) for item in list(record.get("gold_titles") or [])),
             pool_docs=pool_docs,
@@ -77,7 +79,7 @@ class EvidenceQueryState:
             pool_doc_scores=tuple(float(value) for value in raw_scores[: len(pool_docs)]),
             reader_budget_k=int(reader_budget_k),
             stability_window_m=int(stability_window_m),
-            pool_trace=dict(record.get("pool_trace") or {}),
+            pool_trace=dict(record.get("pool_trace") or record.get("pool_trace") or {}),
         )
 
 
@@ -99,16 +101,6 @@ class EvidenceSelectionResult:
     admitted_positions: tuple[int, ...]
     trace: Mapping[str, Any]
     raw_selection_trace: Mapping[str, Any] = field(default_factory=dict)
-
-    @property
-    def protected_baseline_positions(self) -> tuple[int, ...]:
-        """Baseline positions protected by the rank-stability guard."""
-        return self.stable_seed_positions
-
-    @property
-    def protected_baseline_titles(self) -> tuple[str, ...]:
-        """Baseline titles protected by the rank-stability guard."""
-        return tuple(str(item) for item in self.trace.get("protected_baseline_titles", ()))
 
 
 def ordered_unique_positions(values: Sequence[Any], *, pool_size: int, limit: int) -> list[int]:
